@@ -1,6 +1,19 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import numpy as np
+
+def one_hot_encode(arr, n_labels):
+    # Initialize the the encoded array
+    one_hot = np.zeros((arr.size, n_labels), dtype=np.float32)
+    
+    # Fill the appropriate elements with ones
+    one_hot[np.arange(one_hot.shape[0]), arr.flatten()] = 1.
+    
+    # Finally reshape it to get back to the original array
+    one_hot = one_hot.reshape((*arr.shape, n_labels))
+    
+    return one_hot
 
 class Trainer(object):
     def __init__(self, options, model, dataloader, valloader):
@@ -46,6 +59,8 @@ class Trainer(object):
             nn.utils.clip_grad_norm_(self.model.parameters(), 5)
             self.optimizer.step()
             
+            
+            
             av_loss += loss.item()*x.size(0)
             if counter % 100 == 0:
                 sparsity = (torch.sum(torch.where(torch.abs(self.model.rnn.weight_hh_l0.data) < .001, 1.0, 0.0))/(self.model.hidden_size**2)).item()
@@ -58,6 +73,7 @@ class Trainer(object):
         self.model.eval()
         h = self.model.init_hidden()
         av_loss = 0
+        num_correct = 0
         for x, y in self.valloader:
             x, y = x.to(self.device), y.to(self.device)
             
@@ -67,21 +83,25 @@ class Trainer(object):
             output, h = self.model(x, h)
             loss = self.criterion(output[:, -1, :], y)
             
+            _, pred = output[:,-1,:].topk(1, 1, True, True)
+            
+            num_correct += torch.sum(pred == y.data)
             av_loss += loss.item()*x.size(0)
-        av_loss = av_loss/len(self.valloader)
+        av_loss = av_loss/(len(self.valloader)*self.batch_size)
+        accuracy = num_correct/(len(self.valloader)*self.batch_size)
         if av_loss < self.besterr:
             self.besterr = av_loss
             torch.save(self.model.state_dict(), 'models/bestachieved' + self.savefile +  '.pt')
-        return av_loss
+        return av_loss, accuracy
     
     def train(self):
         for e in range(self.epochs):
             l = self.train_step(e)/len(self.dataloader)
             with torch.no_grad():
-                v = self.val_step()
+                v, acc = self.val_step()
             sparsity = (torch.sum(torch.where(torch.abs(self.model.rnn.weight_hh_l0.data) < .001, 1.0, 0.0))/(self.model.hidden_size**2)).item()
-            print(''.join(['=' for i in range(60)]))
-            print("Epoch: {}. Train Loss: {:.3f}. Validation: {:.3f}. Sparsity: {:.3f}".format(e, l, v, sparsity))
-            print(''.join(['=' for i in range(60)]))
+            print(''.join(['=' for i in range(66)]))
+            print("Epoch: {}. Train Loss: {:.3f}. Validation: {:.3f}. Accuracy: {:.3f}. Sparsity: {:.3f}".format(e, l, v, acc, sparsity))
+            print(''.join(['=' for i in range(66)]))
             with open('Graphs/traindata/' + self.savefile + '.txt', 'a') as thefile:
-                thefile.write("Epoch: {}. Loss: {}. Validation: {}. Sparsity: {}\n".format(e, l, v, sparsity))
+                thefile.write("Epoch: {}. Loss: {}. Validation: {}. Accuracy: {:.3f}. Sparsity: {}\n".format(e, l, v, acc, sparsity))

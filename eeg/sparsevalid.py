@@ -25,6 +25,7 @@ class SparseValidator(object):
         self.model.eval()
         h = self.model.init_hidden()
         av_loss = 0
+        num_correct = 0
         for x, y in self.testloader:
             x, y = x.to(self.device), y.to(self.device)
             
@@ -33,17 +34,21 @@ class SparseValidator(object):
             
             output, h = self.model(x, h)
             loss = self.criterion(output[:, -1, :], y)
+            _, pred = output[:,-1,:].topk(1, 1, True, True)
+            
+            num_correct += torch.sum(pred == y.data)
             
             av_loss += loss.item()*x.size(0)
-        av_loss = av_loss/len(self.testloader)
-        return av_loss
+        av_loss = av_loss/(len(self.testloader)*self.batch_size)
+        acc = num_correct/(len(self.testloader)*self.batch_size)
+        return av_loss, acc
 
     def test(self):
-        tloss = self.val_step()
+        tloss, acc = self.val_step()
         sparsity = (torch.sum(torch.where(torch.abs(self.model.rnn.weight_hh_l0.data) < .001, 1.0, 0.0))/(self.model.hidden_size**2)).item()
-        print("Test Loss: {:.3f}. Sparsity: {:.3f}".format(tloss, sparsity))
+        print("Test Loss: {:.3f}. Accuracy: {:.3f}. Sparsity: {:.3f}".format(tloss, acc, sparsity))
         with open('Graphs/traindata/' + self.savefile + '.txt', 'a') as the_file:
-            the_file.write("Test Loss: {:.3f}. Sparsity: {:.3f}\n".format(tloss, sparsity))
+            the_file.write("Test Loss: {:.3f}. Accuracy: {:.3f}. Sparsity: {:.3f}\n".format(tloss, acc, sparsity))
 
                 
                 
@@ -54,6 +59,7 @@ class PercentileSparse(object):
         self.model = model
         self.hidden_size = options.hidden_size
         self.percentile = percentile
+        self.batch_size = options.batch_size
         self.savefile = options.savefile
         self.testloader = testloader
         self.percentile = percentile
@@ -76,6 +82,7 @@ class PercentileSparse(object):
         
         h = self.model.init_hidden()
         av_loss = 0
+        num_correct = 0
         for x, y in self.testloader:
             x, y = x.to(self.device), y.to(self.device)
             
@@ -84,18 +91,21 @@ class PercentileSparse(object):
             
             output, h = self.model(x, h)
             loss = self.criterion(output[:, -1, :], y)
+            _, pred = output[:,-1,:].topk(1, 1, True, True)
             
             av_loss += loss.item()*x.size(0)
-        av_loss = av_loss/len(self.testloader)
+            num_correct += torch.sum(pred == y.data)
+        av_loss = av_loss/(len(self.testloader)*self.batch_size)
+        acc = num_correct/(len(self.testloader)*self.batch_size)
 
 
-        return av_loss
+        return av_loss, acc
 
     def test(self):
-        tloss = self.val_step()
+        tloss, acc = self.val_step()
         #sparsity = (torch.sum(torch.where(self.model.rnn.weight_hh_l0.data == 0, 1.0, 0.0))/(self.model.hidden_size**2)).item()
-        print('Percentile {}: Loss: {:.3f}'.format(
-               self.percentile, tloss))
+        print('Percentile {}: Loss: {:.3f} Accuracy: {:.3f}'.format(
+               self.percentile, tloss, acc))
         with open('Graphs/traindata/' + self.savefile + '.txt', 'a') as the_file:
-               the_file.write('Percentile {}: Loss: {:.3f}\n'.format(
-               self.percentile, tloss))
+               the_file.write('Percentile {}: Loss: {:.3f} Accuracy: {:.3f}\n'.format(
+               self.percentile, tloss, acc))
