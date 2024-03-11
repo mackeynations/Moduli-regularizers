@@ -18,7 +18,7 @@ class Chrysalis(nn.Module):
         self.reg = None
         
         # RNN structure
-        #self.encoder = nn.Linear(self.input_size, self.hidden_size)
+        self.encoder = nn.Linear(self.input_size, self.hidden_size)
         self.rnn = nn.RNN(self.input_size, self.hidden_size, self.n_layers, batch_first = True, 
                           nonlinearity = options.activation, bias=False)
         self.decoder = nn.Linear(self.hidden_size, 11, bias=False)
@@ -26,7 +26,8 @@ class Chrysalis(nn.Module):
         # functions to run at init
         self.get_regularizer(options)
         
-    def forward(self, x, hidden):
+    def forward(self, w, x):
+        hidden = self.encoder(w)[None]
         out, hidden = self.rnn(x, hidden)
         out = out.contiguous().view(self.batch_size, -1, self.hidden_size)
         out = self.decoder(out)

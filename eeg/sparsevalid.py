@@ -16,6 +16,7 @@ class SparseValidator(object):
         self.testloader = testloader
         self.criterion = torch.nn.MSELoss()
         self.device = options.device
+        self.batch_size = options.batch_size
 
         self.loss = []
         self.err = []
@@ -26,15 +27,15 @@ class SparseValidator(object):
         h = self.model.init_hidden()
         av_loss = 0
         num_correct = 0
-        for x, y in self.testloader:
-            x, y = x.to(self.device), y.to(self.device)
+        for w, x, y in self.testloader:
+            w, x, y = w.to(self.device), x.to(self.device), y.to(self.device)
             
             # This is to stop us backpropagating into infinity
             #h = tuple(each.data for each in h)
             
-            output, h = self.model(x, h)
-            loss = self.criterion(output[:, -1, :], y)
-            _, pred = output[:,-1,:].topk(1, 1, True, True)
+            output, h = self.model(w, x)
+            loss = self.criterion(output[:, -1, :], F.one_hot(y, num_classes=11).type(torch.float32))
+            _, pred = torch.max(output[:,-1,:], dim=1)
             
             num_correct += torch.sum(pred == y.data)
             
@@ -83,15 +84,15 @@ class PercentileSparse(object):
         h = self.model.init_hidden()
         av_loss = 0
         num_correct = 0
-        for x, y in self.testloader:
-            x, y = x.to(self.device), y.to(self.device)
+        for w, x, y in self.testloader:
+            w, x, y = w.to(self.device), x.to(self.device), y.to(self.device)
             
             # This is to stop us backpropagating into infinity
             #h = tuple(each.data for each in h)
             
-            output, h = self.model(x, h)
-            loss = self.criterion(output[:, -1, :], y)
-            _, pred = output[:,-1,:].topk(1, 1, True, True)
+            output, h = self.model(w, x)
+            loss = self.criterion(output[:, -1, :], F.one_hot(y, num_classes=11).type(torch.float32))
+            _, pred = torch.max(output[:,-1,:], dim=1)
             
             av_loss += loss.item()*x.size(0)
             num_correct += torch.sum(pred == y.data)

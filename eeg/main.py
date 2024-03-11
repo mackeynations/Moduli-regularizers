@@ -124,10 +124,14 @@ class EEGData(Dataset):
         index = int(14*index)
         if torch.is_tensor(index):
             index = index.tolist()
-        x, y = (torch.from_numpy(self.data[index:index+14, :-1]).float().transpose(0,1), one_hot_encode(self.sols[index, -1], 11))
+        #x, y = torch.from_numpy(self.data[index:index+14,:]).float().transpose(0,1), one_hot_encode(self.sols[index, -1], 11)
+        x, y = torch.from_numpy(self.data[index:index+14,:]).float().transpose(0,1), self.sols[index, 0]
+
         if self.transform != None:
             x, y = self.transform(x), y
-        return x, y
+        w = x[0,:]
+        x = x[1:,:] - x[:-1,:]
+        return w, x, y
     
     def __len__(self):
         return len(self.data)//14

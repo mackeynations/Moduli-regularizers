@@ -39,22 +39,22 @@ class Trainer(object):
         h = self.model.init_hidden()
         av_loss = 0
         counter = 0
-        for x, y in self.dataloader:
+        for w, x, y in self.dataloader:
             counter+=1
-            x, y = x.to(self.device), y.to(self.device)
+            w, x, y = w.to(self.device), x.to(self.device), y.to(self.device)
             
             # This is to stop us backpropagating into infinity
             #h = tuple(each.data for each in h)
             
             
             self.model.zero_grad()
-            output, h = self.model(x, h)
+            output, h = self.model(w, x)
             
             #Clone hidden values to prevent infinite backprop?
             #I've never fully understood this part
             h = h.data
             
-            loss = self.criterion(output[:, -1, :], y) + self.weight_decay*self.model.regularizer()
+            loss = self.criterion(output[:, -1, :], F.one_hot(y, num_classes=11).type(torch.float32)) + self.weight_decay*self.model.regularizer()
             loss.backward()
             nn.utils.clip_grad_norm_(self.model.parameters(), 5)
             self.optimizer.step()
@@ -74,16 +74,16 @@ class Trainer(object):
         h = self.model.init_hidden()
         av_loss = 0
         num_correct = 0
-        for x, y in self.valloader:
-            x, y = x.to(self.device), y.to(self.device)
+        for w, x, y in self.valloader:
+            w, x, y = w.to(self.device), x.to(self.device), y.to(self.device)
             
             # This is to stop us backpropagating into infinity
             #h = tuple(each.data for each in h)
             
-            output, h = self.model(x, h)
-            loss = self.criterion(output[:, -1, :], y)
+            output, h = self.model(w, x)
+            loss = self.criterion(output[:, -1, :], F.one_hot(y, num_classes=11).type(torch.float32))
             
-            _, pred = output[:,-1,:].topk(1, 1, True, True)
+            _, pred = torch.max(output[:,-1,:], dim=1)
             
             num_correct += torch.sum(pred == y.data)
             av_loss += loss.item()*x.size(0)
