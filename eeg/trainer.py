@@ -36,7 +36,7 @@ class Trainer(object):
         
     def train_step(self, e):
         self.model.train()
-        h = self.model.init_hidden()
+        #h = self.model.init_hidden()
         av_loss = 0
         counter = 0
         for w, x, y in self.dataloader:

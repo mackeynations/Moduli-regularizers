@@ -7,7 +7,9 @@ import pandas as pd
 import torch
 import torch.cuda
 import torch.nn as nn
+import torchvision.transforms as transforms
 import xarray as xr
+import pywt
 import gc
 
 #PYTORCH_NO_CUDA_MEMORY_CACHING=1
@@ -38,7 +40,7 @@ parser.add_argument('--RNN_type',
                     default='RNN',
                     help='RNN or LSTM')
 parser.add_argument('--activation',
-                    default='relu',
+                    default='tanh',
                     help='recurrent nonlinearity')
 parser.add_argument('--csv_file',
                    default='data/tocsv.csv',
@@ -82,8 +84,13 @@ parser.add_argument('--trainembed',
                     help = 'Whether embedding is registered, trained parameters. Not compatible with changeembed.')
 parser.add_argument('--num_params',
                     default=14)
+parser.add_argument('--wavelet',
+                    default=None,
+                   help = 'Try None, or db[k] for k an even integer')
 
 options = parser.parse_args()
+if options.wavelet != None:
+    options.num_params = 2*options.num_params
 
 print(f'Using device: {options.device}')
 
@@ -145,9 +152,25 @@ class ReNormEEG(object):
         sample = sample - self.means.view(1, -1)
         sample = sample/self.stds.view(1, -1)
         return sample
-    
-    
+
+class WaveletTrans(object):
+    def __init__(self, wavelet = 'db4'):
+        self.wavelet = wavelet
+    def __call__(self, sample):
+        if len(sample.shape) == 2:
+            D = pywt.dwtn(sample, self.wavelet, axes=[0])
+            A = torch.cat((torch.from_numpy(D['a']), torch.from_numpy(D['d'])), dim=1)
+        elif len(sample.shape) == 3:
+            D = pywt.dwtn(sample, self.wavelet, axes=[1])
+            A = torch.cat(D['a'], D['d'], dim=2)
+        else:
+            raise ValueError('something went wrong with the wavelets')
+        return A
+
 ren = ReNormEEG('data/prep.csv')
+if options.wavelet != None:
+    wav = WaveletTrans(options.wavelet)
+    ren = transforms.Compose([ren, wav])
 
 dataset = EEGData(options.csv_file, options.csv_classes, transform = ren)
 l = len(dataset)

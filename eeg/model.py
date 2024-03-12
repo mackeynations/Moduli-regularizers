@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import numpy as np
 
 # This class isn't going to use lattitude/longitude data in any way, and leave it to the model to learn those
@@ -27,7 +28,7 @@ class Chrysalis(nn.Module):
         self.get_regularizer(options)
         
     def forward(self, w, x):
-        hidden = self.encoder(w)[None]
+        hidden = F.tanh(self.encoder(w)[None])
         out, hidden = self.rnn(x, hidden)
         out = out.contiguous().view(self.batch_size, -1, self.hidden_size)
         out = self.decoder(out)
