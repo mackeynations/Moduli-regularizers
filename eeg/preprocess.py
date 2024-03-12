@@ -14,7 +14,7 @@ with open('data/EP1.01.txt') as myfile:
         k += 1
         if k < 15:
             mydict[line[3]] = []
-            #mydictstd[line[3]] = []
+            mydictstd[line[3]] = []
         if k == 15:
             break
 
@@ -31,12 +31,12 @@ with open('data/EP1.01.txt') as myfile:
                 writer.writerow(newt)
                 sols = [int(line[4])+1]
                 writer2.writerow(sols)
-            mydict[line[3]].append(np.mean(line[-1].split(',')))
-            mydictstd[line[3]].append(np.std([float(m) for m in line[-1].split(',')]))
+                mydict[line[3]].append(np.mean([float(m) for m in newt]))
+                mydictstd[line[3]].append(np.std([float(m) for m in newt]))
         
 #for k in mydict.keys():
 #    print(np.min(mydict[k]))
 with open('data/prep.csv', 'a') as myfile:
     for i in mydict.keys():
-        myfile.write(i + ',' + str(np.mean(mydict[i])) + ',' + str(np.std(mydictstd[i])) + '\n') 
+        myfile.write(i + ',' + str(np.mean(mydict[i])) + ',' + str(np.mean(mydictstd[i])) + '\n') 
     
