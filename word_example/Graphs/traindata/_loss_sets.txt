@@ -1,0 +1,316 @@
+| end of epoch   1 | time: 60.77s | valid loss 49.41 | valid ppl 2864474075122131009536.00
+| end of epoch   2 | time: 60.96s | valid loss 77.25 | valid ppl 3543590218515464509330740771553280.00
+| end of epoch   3 | time: 60.77s | valid loss  9.53 | valid ppl 13698.10
+| end of epoch   4 | time: 60.84s | valid loss 14.96 | valid ppl 3152531.57
+| End of training | test loss  9.41 | test ppl 12239.70| Percentile 20 | test loss 10.12 | test ppl 24873.28| Percentile 40 | test loss 10.12 | test ppl 24876.63| Percentile 60 | test loss 11.56 | test ppl 104907.44| Percentile 80 | test loss  9.41 | test ppl 12243.67| Percentile 90 | test loss  9.41 | test ppl 12268.78| Percentile 95 | test loss  9.42 | test ppl 12280.68| end of epoch   1 | time: 60.45s | valid loss 49.41 | valid ppl 2864474075122131009536.00
+| end of epoch   2 | time: 60.21s | valid loss 77.25 | valid ppl 3543590218515464509330740771553280.00
+| end of epoch   3 | time: 60.35s | valid loss  9.53 | valid ppl 13698.10
+| end of epoch   4 | time: 60.60s | valid loss 14.96 | valid ppl 3152531.57
+| End of training | test loss  9.41 | test ppl 12239.70| Percentile 20 | test loss 10.12 | test ppl 24873.28| Percentile 40 | test loss 10.12 | test ppl 24876.63| Percentile 60 | test loss 11.56 | test ppl 104907.44| Percentile 80 | test loss  9.41 | test ppl 12243.67| Percentile 90 | test loss  9.41 | test ppl 12268.78| Percentile 95 | test loss  9.42 | test ppl 12280.68| Percentile 100 | test loss 11.71 | test ppl 122090.33| end of epoch   1 | time: 60.51s | valid loss 49.41 | valid ppl 2864474075122131009536.00
+| end of epoch   2 | time: 60.57s | valid loss 77.25 | valid ppl 3543590218515464509330740771553280.00
+| end of epoch   3 | time: 60.24s | valid loss  9.53 | valid ppl 13698.10
+| end of epoch   4 | time: 60.49s | valid loss 14.96 | valid ppl 3152531.57
+| End of training | test loss  9.41 | test ppl 12239.70| Percentile 20 | test loss 10.12 | test ppl 24873.28| Percentile 40 | test loss 10.12 | test ppl 24876.63| Percentile 60 | test loss 11.56 | test ppl 104907.44| Percentile 80 | test loss  9.41 | test ppl 12243.67| Percentile 90 | test loss  9.41 | test ppl 12268.78| Percentile 95 | test loss  9.42 | test ppl 12280.68| Percentile 100 | test loss 11.71 | test ppl 122090.33| end of epoch   1 | time: 44.11s | valid loss 49.41 | valid ppl 2864474075122131009536.00
+| end of epoch   2 | time: 57.72s | valid loss 77.25 | valid ppl 3543590218515464509330740771553280.00
+| end of epoch   3 | time: 60.71s | valid loss  9.53 | valid ppl 13698.10
+| end of epoch   4 | time: 60.83s | valid loss 14.96 | valid ppl 3152531.57
+| End of training | test loss  9.41 | test ppl 12239.70| end of epoch   1 | time: 61.39s | valid loss 49.41 | valid ppl 2864474075122131009536.00
+| end of epoch   2 | time: 61.08s | valid loss 77.25 | valid ppl 3543590218515464509330740771553280.00
+| end of epoch   3 | time: 61.02s | valid loss  9.53 | valid ppl 13698.10
+| end of epoch   4 | time: 60.98s | valid loss 14.96 | valid ppl 3152531.57
+| End of training | test loss  9.41 | test ppl 12239.70| end of epoch   1 | time: 60.70s | valid loss 49.41 | valid ppl 2864474075122131009536.00
+| end of epoch   2 | time: 60.87s | valid loss 77.25 | valid ppl 3543590218515464509330740771553280.00
+| end of epoch   3 | time: 60.99s | valid loss  9.53 | valid ppl 13698.10
+| end of epoch   4 | time: 60.96s | valid loss 14.96 | valid ppl 3152531.57
+| End of training | test loss  9.41 | test ppl 12239.70| Percentile 20 | test loss 10.12 | test ppl 24873.28| Percentile 40 | test loss 10.12 | test ppl 24876.63| Percentile 60 | test loss 11.56 | test ppl 104907.44| Percentile 80 | test loss  9.41 | test ppl 12243.67| Percentile 90 | test loss  9.41 | test ppl 12268.78| Percentile 95 | test loss  9.42 | test ppl 12280.68| Percentile 100 | test loss 11.71 | test ppl 122196.11| end of epoch   1 | time: 60.76s | valid loss 49.41 | valid ppl 2864474075122131009536.00
+| end of epoch   2 | time: 60.97s | valid loss 77.25 | valid ppl 3543590218515464509330740771553280.00
+| end of epoch   3 | time: 60.84s | valid loss  9.53 | valid ppl 13698.10
+| end of epoch   4 | time: 61.00s | valid loss 14.96 | valid ppl 3152531.57
+| End of training | test loss  9.41 | test ppl 12239.70| Percentile 20 | test loss 10.12 | test ppl 24873.28| Percentile 40 | test loss 10.12 | test ppl 24876.63| Percentile 60 | test loss 11.56 | test ppl 104907.44| Percentile 80 | test loss  9.41 | test ppl 12243.67| Percentile 90 | test loss  9.41 | test ppl 12268.78| Percentile 95 | test loss  9.42 | test ppl 12280.68| Percentile 99 | test loss 11.35 | test ppl 84943.11| Percentile 100 | test loss 11.71 | test ppl 122090.33| end of epoch   1 | time: 42.93s | valid loss 18.53 | valid ppl 111602250.59
+| end of epoch   2 | time: 42.65s | valid loss 14.91 | valid ppl 2992455.14
+| end of epoch   3 | time: 33.17s | valid loss 17.03 | valid ppl 24881426.94
+| end of epoch   4 | time: 31.22s | valid loss  8.36 | valid ppl  4278.88
+| End of training | test loss  8.30 | test ppl  4022.12| Percentile 20 | test loss  8.30 | test ppl  4021.70| Percentile 40 | test loss  8.30 | test ppl  4022.39| Percentile 60 | test loss  8.30 | test ppl  4025.21| Percentile 80 | test loss  8.30 | test ppl  4017.33| Percentile 90 | test loss  8.28 | test ppl  3952.56| Percentile 95 | test loss  8.25 | test ppl  3815.43| Percentile 99 | test loss  7.40 | test ppl  1636.08| Percentile 100 | test loss  7.38 | test ppl  1604.69| end of epoch   1 | time: 42.96s | valid loss 18.53 | valid ppl 111602250.59
+| end of epoch   2 | time: 42.88s | valid loss 14.91 | valid ppl 2992455.14
+| end of epoch   3 | time: 43.01s | valid loss 17.03 | valid ppl 24881426.94
+| end of epoch   4 | time: 42.72s | valid loss  8.36 | valid ppl  4278.88
+| End of training | test loss  8.30 | test ppl  4022.12| Percentile 20 | test loss  8.30 | test ppl  4021.70| Percentile 40 | test loss  8.30 | test ppl  4022.39| Percentile 60 | test loss  8.30 | test ppl  4025.21| Percentile 80 | test loss  8.30 | test ppl  4017.33| Percentile 90 | test loss  8.28 | test ppl  3952.56| Percentile 95 | test loss  8.25 | test ppl  3815.43| Percentile 99 | test loss  7.40 | test ppl  1636.08| Percentile 100 | test loss  7.38 | test ppl  1604.69| end of epoch   1 | time: 42.97s | valid loss 18.53 | valid ppl 111602250.59
+| end of epoch   2 | time: 42.50s | valid loss 14.91 | valid ppl 2992455.14
+| end of epoch   3 | time: 42.61s | valid loss 17.03 | valid ppl 24881426.94
+| end of epoch   4 | time: 42.76s | valid loss  8.36 | valid ppl  4278.88
+| end of epoch   5 | time: 42.54s | valid loss  7.73 | valid ppl  2281.27
+| end of epoch   6 | time: 42.63s | valid loss  7.52 | valid ppl  1852.56
+| end of epoch   7 | time: 42.65s | valid loss  7.62 | valid ppl  2042.34
+| end of epoch   8 | time: 42.64s | valid loss  6.99 | valid ppl  1089.39
+| end of epoch   9 | time: 42.79s | valid loss  6.99 | valid ppl  1090.85
+| end of epoch  10 | time: 42.65s | valid loss  6.92 | valid ppl  1014.74
+| end of epoch  11 | time: 42.65s | valid loss  6.92 | valid ppl  1013.98
+| end of epoch  12 | time: 42.61s | valid loss  6.92 | valid ppl  1014.00
+| end of epoch  13 | time: 42.67s | valid loss  6.91 | valid ppl   998.00
+| end of epoch  14 | time: 42.58s | valid loss  6.90 | valid ppl   997.20
+| end of epoch  15 | time: 42.70s | valid loss  6.90 | valid ppl   996.85
+| end of epoch  16 | time: 42.70s | valid loss  6.90 | valid ppl   996.98
+| end of epoch  17 | time: 42.77s | valid loss  6.90 | valid ppl   991.88
+| end of epoch  18 | time: 42.55s | valid loss  6.90 | valid ppl   991.62
+| end of epoch  19 | time: 42.72s | valid loss  6.90 | valid ppl   991.52
+| end of epoch  20 | time: 36.45s | valid loss  6.90 | valid ppl   991.66
+| end of epoch  21 | time: 31.10s | valid loss  6.90 | valid ppl   989.02
+| end of epoch  22 | time: 31.13s | valid loss  6.90 | valid ppl   988.95
+| end of epoch  23 | time: 34.24s | valid loss  6.90 | valid ppl   988.92
+| end of epoch  24 | time: 42.64s | valid loss  6.90 | valid ppl   988.90
+| end of epoch  25 | time: 42.69s | valid loss  6.90 | valid ppl   988.89
+| end of epoch  26 | time: 42.73s | valid loss  6.90 | valid ppl   988.92
+| end of epoch  27 | time: 42.87s | valid loss  6.90 | valid ppl   988.49
+| end of epoch  28 | time: 42.74s | valid loss  6.90 | valid ppl   988.47
+| end of epoch  29 | time: 42.62s | valid loss  6.90 | valid ppl   988.45
+| end of epoch  30 | time: 42.65s | valid loss  6.90 | valid ppl   988.44
+| end of epoch  31 | time: 42.93s | valid loss  6.90 | valid ppl   988.43
+| end of epoch  32 | time: 42.56s | valid loss  6.90 | valid ppl   988.41
+| end of epoch  33 | time: 42.81s | valid loss  6.90 | valid ppl   988.42
+| end of epoch  34 | time: 42.76s | valid loss  6.90 | valid ppl   988.46
+| end of epoch  35 | time: 42.61s | valid loss  6.90 | valid ppl   988.46
+| end of epoch  36 | time: 42.78s | valid loss  6.90 | valid ppl   988.46
+| end of epoch  37 | time: 42.71s | valid loss  6.90 | valid ppl   988.46
+| end of epoch  38 | time: 42.75s | valid loss  6.90 | valid ppl   988.47
+| end of epoch  39 | time: 42.61s | valid loss  6.90 | valid ppl   988.47
+| end of epoch  40 | time: 42.75s | valid loss  6.90 | valid ppl   988.47
+| End of training | test loss  6.84 | test ppl   931.01| Percentile 20 | test loss  6.84 | test ppl   931.01| Percentile 40 | test loss  6.84 | test ppl   930.99| Percentile 60 | test loss  6.84 | test ppl   930.96| Percentile 80 | test loss  6.84 | test ppl   930.86| Percentile 90 | test loss  6.84 | test ppl   931.20| Percentile 95 | test loss  6.84 | test ppl   934.86| Percentile 99 | test loss  6.93 | test ppl  1023.67| Percentile 100 | test loss  6.93 | test ppl  1019.30| end of epoch   1 | time: 42.84s | valid loss 18.53 | valid ppl 111602250.59
+| end of epoch   2 | time: 42.63s | valid loss 14.91 | valid ppl 2992455.14
+| end of epoch   3 | time: 42.57s | valid loss 17.03 | valid ppl 24881426.94
+| end of epoch   4 | time: 42.41s | valid loss  8.36 | valid ppl  4278.88
+| end of epoch   5 | time: 42.83s | valid loss  7.73 | valid ppl  2281.27
+| end of epoch   6 | time: 42.62s | valid loss  7.52 | valid ppl  1852.56
+| end of epoch   7 | time: 42.63s | valid loss  7.62 | valid ppl  2042.34
+| end of epoch   8 | time: 42.60s | valid loss  6.99 | valid ppl  1089.39
+| end of epoch   9 | time: 42.76s | valid loss  6.99 | valid ppl  1090.85
+| end of epoch  10 | time: 42.83s | valid loss  6.92 | valid ppl  1014.74
+| End of training | test loss  6.86 | test ppl   952.75
+| end of epoch   1 | time: 38.69s | valid loss 18.53 | valid ppl 111602250.59
+| end of epoch   2 | time: 30.94s | valid loss 14.91 | valid ppl 2992455.14
+| end of epoch   3 | time: 30.97s | valid loss 17.03 | valid ppl 24881426.94
+| end of epoch   4 | time: 32.55s | valid loss  8.36 | valid ppl  4278.88
+| end of epoch   5 | time: 42.81s | valid loss  7.73 | valid ppl  2281.27
+| end of epoch   6 | time: 42.67s | valid loss  7.52 | valid ppl  1852.56
+| end of epoch   7 | time: 42.59s | valid loss  7.62 | valid ppl  2042.34
+| end of epoch   8 | time: 42.75s | valid loss  6.99 | valid ppl  1089.39
+| end of epoch   9 | time: 42.49s | valid loss  6.99 | valid ppl  1090.85
+| end of epoch  10 | time: 42.55s | valid loss  6.92 | valid ppl  1014.74
+| End of training | test loss  6.86 | test ppl   952.75
+| end of epoch   1 | time: 42.57s | valid loss 18.53 | valid ppl 111602250.59
+| end of epoch   2 | time: 42.49s | valid loss 14.91 | valid ppl 2992455.14
+| end of epoch   3 | time: 42.72s | valid loss 17.03 | valid ppl 24881426.94
+| end of epoch   4 | time: 42.50s | valid loss  8.36 | valid ppl  4278.88
+| end of epoch   5 | time: 42.43s | valid loss  7.73 | valid ppl  2281.27
+| end of epoch   6 | time: 42.45s | valid loss  7.52 | valid ppl  1852.56
+| end of epoch   7 | time: 42.61s | valid loss  7.62 | valid ppl  2042.34
+| end of epoch   8 | time: 42.71s | valid loss  6.99 | valid ppl  1089.39
+| end of epoch   9 | time: 42.61s | valid loss  6.99 | valid ppl  1090.85
+| end of epoch  10 | time: 42.40s | valid loss  6.92 | valid ppl  1014.74
+| End of training | test loss  6.86 | test ppl   952.75
+| Percentile 20 | test loss  6.92 | test ppl  1008.19
+| Percentile 40 | test loss  6.92 | test ppl  1009.49
+| Percentile 60 | test loss  6.92 | test ppl  1011.72
+| Percentile 80 | test loss  6.92 | test ppl  1011.30
+| Percentile 90 | test loss  6.92 | test ppl  1012.74
+| Percentile 95 | test loss  6.92 | test ppl  1012.93
+| Percentile 99 | test loss  6.92 | test ppl  1013.31
+| Percentile 100 | test loss  6.92 | test ppl  1012.92
+| end of epoch   1 | time: 42.50s | valid loss 18.53 | valid ppl 111602250.59
+| end of epoch   2 | time: 42.50s | valid loss 14.91 | valid ppl 2992455.14
+| end of epoch   3 | time: 42.41s | valid loss 17.03 | valid ppl 24881426.94
+| end of epoch   4 | time: 42.25s | valid loss  8.36 | valid ppl  4278.88
+| end of epoch   5 | time: 42.30s | valid loss  7.73 | valid ppl  2281.27
+| end of epoch   6 | time: 42.42s | valid loss  7.52 | valid ppl  1852.56
+| end of epoch   7 | time: 42.41s | valid loss  7.62 | valid ppl  2042.34
+| end of epoch   8 | time: 34.74s | valid loss  6.99 | valid ppl  1089.39
+| end of epoch   9 | time: 30.95s | valid loss  6.99 | valid ppl  1090.85
+| end of epoch  10 | time: 30.97s | valid loss  6.92 | valid ppl  1014.74
+| End of training | test loss  6.86 | test ppl   952.75
+| Percentile 20 | test loss  6.92 | test ppl  1012.86
+| Percentile 40 | test loss  6.92 | test ppl  1012.86
+| Percentile 60 | test loss  6.92 | test ppl  1012.85
+| Percentile 80 | test loss  6.92 | test ppl  1012.85
+| Percentile 90 | test loss  6.92 | test ppl  1012.85
+| Percentile 95 | test loss  6.92 | test ppl  1012.85
+| Percentile 99 | test loss  6.92 | test ppl  1012.85
+| Percentile 100 | test loss  6.92 | test ppl  1012.84
+| end of epoch   1 | time: 42.76s | valid loss 18.53 | valid ppl 111602250.59
+| end of epoch   2 | time: 42.75s | valid loss 14.91 | valid ppl 2992455.14
+| end of epoch   3 | time: 42.85s | valid loss 17.03 | valid ppl 24881426.94
+| end of epoch   4 | time: 42.66s | valid loss  8.36 | valid ppl  4278.88
+| end of epoch   5 | time: 42.65s | valid loss  7.73 | valid ppl  2281.27
+| end of epoch   6 | time: 42.86s | valid loss  7.52 | valid ppl  1852.56
+| end of epoch   7 | time: 42.66s | valid loss  7.62 | valid ppl  2042.34
+| end of epoch   8 | time: 42.83s | valid loss  6.99 | valid ppl  1089.39
+| end of epoch   9 | time: 42.87s | valid loss  6.99 | valid ppl  1090.85
+| end of epoch  10 | time: 42.61s | valid loss  6.92 | valid ppl  1014.74
+| End of training | test loss  6.86 | test ppl   952.75
+| Percentile 20 | test loss  6.92 | test ppl  1012.85
+| Percentile 40 | test loss  6.92 | test ppl  1012.85
+| Percentile 60 | test loss  6.92 | test ppl  1012.85
+| Percentile 80 | test loss  6.92 | test ppl  1012.85
+| Percentile 90 | test loss  6.92 | test ppl  1012.84
+| Percentile 95 | test loss  6.92 | test ppl  1012.85
+| Percentile 99 | test loss  6.92 | test ppl  1012.85
+| Percentile 100 | test loss  6.92 | test ppl  1012.84
+| end of epoch   1 | time: 42.76s | valid loss 18.53 | valid ppl 111602250.59
+| end of epoch   2 | time: 43.04s | valid loss 14.91 | valid ppl 2992455.14
+| end of epoch   3 | time: 42.74s | valid loss 17.03 | valid ppl 24881426.94
+| end of epoch   4 | time: 42.89s | valid loss  8.36 | valid ppl  4278.88
+| end of epoch   5 | time: 42.77s | valid loss  7.73 | valid ppl  2281.27
+| end of epoch   6 | time: 42.76s | valid loss  7.52 | valid ppl  1852.56
+| end of epoch   7 | time: 42.74s | valid loss  7.62 | valid ppl  2042.34
+| End of training | test loss  7.45 | test ppl  1724.87
+| Percentile 20 | test loss  7.51 | test ppl  1830.62
+| Percentile 40 | test loss  7.51 | test ppl  1830.62
+| Percentile 60 | test loss  7.51 | test ppl  1830.63
+| Percentile 80 | test loss  7.51 | test ppl  1830.63
+| Percentile 90 | test loss  7.51 | test ppl  1830.62
+| Percentile 95 | test loss  7.51 | test ppl  1830.62
+| Percentile 99 | test loss  7.51 | test ppl  1830.62
+| Percentile 100 | test loss  7.51 | test ppl  1830.62
+| end of epoch   1 | time: 42.75s | valid loss 49.23 | valid ppl 2393481745979988770816.00
+| end of epoch   2 | time: 42.49s | valid loss 28.37 | valid ppl 2097038467748.34
+| end of epoch   3 | time: 42.55s | valid loss 24.47 | valid ppl 42449335826.15
+| end of epoch   4 | time: 42.42s | valid loss 26.44 | valid ppl 304634361239.31
+| end of epoch   5 | time: 42.36s | valid loss 14.52 | valid ppl 2029028.72
+| end of epoch   6 | time: 42.54s | valid loss 13.30 | valid ppl 597640.62
+| end of epoch   7 | time: 42.63s | valid loss 15.10 | valid ppl 3614219.67
+| end of epoch   8 | time: 42.55s | valid loss 11.47 | valid ppl 95481.48
+| end of epoch   9 | time: 42.43s | valid loss  8.37 | valid ppl  4320.85
+| end of epoch  10 | time: 42.41s | valid loss  9.22 | valid ppl 10095.92
+| End of training | test loss  9.56 | test ppl 14173.17
+| Percentile 20 | test loss 13.76 | test ppl 943702.81
+| Percentile 40 | test loss 13.76 | test ppl 945153.20
+| Percentile 60 | test loss 13.76 | test ppl 946311.59
+| Percentile 80 | test loss 13.76 | test ppl 944964.45
+| Percentile 90 | test loss 13.76 | test ppl 947968.55
+| Percentile 95 | test loss 13.76 | test ppl 947580.37
+| Percentile 99 | test loss 13.76 | test ppl 945217.37
+| Percentile 100 | test loss 13.76 | test ppl 948301.45
+| end of epoch   1 | time: 47.00s | valid loss  5.56 | valid ppl   260.52
+| end of epoch   2 | time: 46.95s | valid loss  5.29 | valid ppl   197.63
+| end of epoch   3 | time: 47.23s | valid loss  5.15 | valid ppl   172.25
+| end of epoch   4 | time: 47.27s | valid loss  5.05 | valid ppl   156.07
+| end of epoch   5 | time: 47.35s | valid loss  5.00 | valid ppl   148.73
+| end of epoch   6 | time: 47.25s | valid loss  4.98 | valid ppl   145.88
+| end of epoch   7 | time: 47.22s | valid loss  4.93 | valid ppl   139.06
+| end of epoch   8 | time: 47.17s | valid loss  4.90 | valid ppl   134.76
+| end of epoch   9 | time: 47.06s | valid loss  4.90 | valid ppl   133.80
+| end of epoch  10 | time: 47.14s | valid loss  4.88 | valid ppl   131.07
+| End of training | test loss  4.80 | test ppl   121.44
+| end of epoch   1 | time: 46.84s | valid loss  5.56 | valid ppl   260.52
+| end of epoch   2 | time: 46.88s | valid loss  5.29 | valid ppl   197.63
+| end of epoch   3 | time: 46.97s | valid loss  5.15 | valid ppl   172.25
+| end of epoch   4 | time: 46.95s | valid loss  5.05 | valid ppl   156.07
+| end of epoch   5 | time: 47.13s | valid loss  5.00 | valid ppl   148.73
+| end of epoch   6 | time: 47.10s | valid loss  4.98 | valid ppl   145.88
+| end of epoch   7 | time: 47.09s | valid loss  4.93 | valid ppl   139.06
+| end of epoch   8 | time: 47.06s | valid loss  4.90 | valid ppl   134.76
+| end of epoch   9 | time: 47.08s | valid loss  4.90 | valid ppl   133.80
+| end of epoch  10 | time: 47.08s | valid loss  4.88 | valid ppl   131.07
+| End of training | test loss  4.80 | test ppl   121.44
+| Percentile 20 | test loss  9.82 | test ppl 18372.46
+| Percentile 40 | test loss  9.82 | test ppl 18366.84
+| Percentile 60 | test loss  9.82 | test ppl 18314.39
+| Percentile 80 | test loss  9.81 | test ppl 18292.28
+| Percentile 90 | test loss  9.81 | test ppl 18245.63
+| Percentile 95 | test loss  9.81 | test ppl 18238.46
+| Percentile 99 | test loss  9.81 | test ppl 18270.98
+| Percentile 100 | test loss  9.82 | test ppl 18313.96
+| end of epoch   1 | time: 46.86s | valid loss  5.56 | valid ppl   260.52
+| end of epoch   2 | time: 46.96s | valid loss  5.29 | valid ppl   197.63
+| end of epoch   3 | time: 47.01s | valid loss  5.15 | valid ppl   172.25
+| end of epoch   4 | time: 43.81s | valid loss  5.05 | valid ppl   156.07
+| end of epoch   5 | time: 34.64s | valid loss  5.00 | valid ppl   148.73
+| end of epoch   6 | time: 34.73s | valid loss  4.98 | valid ppl   145.88
+| end of epoch   7 | time: 38.59s | valid loss  4.93 | valid ppl   139.06
+| end of epoch   8 | time: 47.61s | valid loss  4.90 | valid ppl   134.76
+| end of epoch   9 | time: 47.42s | valid loss  4.90 | valid ppl   133.80
+| end of epoch  10 | time: 47.53s | valid loss  4.88 | valid ppl   131.07
+| End of training | test loss  4.80 | test ppl   121.44
+| Percentile 20 | test loss  4.80 | test ppl   121.46
+| Percentile 40 | test loss  4.80 | test ppl   121.54
+| Percentile 60 | test loss  4.80 | test ppl   121.68
+| Percentile 80 | test loss  4.81 | test ppl   122.51
+| Percentile 90 | test loss  4.82 | test ppl   123.96
+| Percentile 95 | test loss  4.83 | test ppl   125.71
+| Percentile 99 | test loss  4.87 | test ppl   130.18
+| Percentile 100 | test loss  4.98 | test ppl   145.18
+| end of epoch   1 | time: 46.81s | valid loss  5.42 | valid ppl   225.80
+| end of epoch   2 | time: 46.86s | valid loss  5.20 | valid ppl   180.75
+| end of epoch   3 | time: 47.03s | valid loss  5.11 | valid ppl   165.62
+| end of epoch   4 | time: 47.10s | valid loss  5.09 | valid ppl   163.10
+| end of epoch   5 | time: 47.01s | valid loss  5.09 | valid ppl   162.96
+| end of epoch   6 | time: 47.04s | valid loss  5.12 | valid ppl   167.60
+| end of epoch   7 | time: 47.00s | valid loss  5.01 | valid ppl   150.24
+| end of epoch   8 | time: 47.13s | valid loss  5.04 | valid ppl   154.21
+| end of epoch   9 | time: 47.05s | valid loss  4.99 | valid ppl   147.35
+| end of epoch  10 | time: 47.07s | valid loss  5.00 | valid ppl   148.91
+| End of training | test loss  4.93 | test ppl   138.08
+| Percentile 20 | test loss  4.93 | test ppl   138.05
+| Percentile 40 | test loss  4.93 | test ppl   137.76
+| Percentile 60 | test loss  4.92 | test ppl   137.17
+| Percentile 80 | test loss  4.93 | test ppl   137.81
+| Percentile 90 | test loss  4.96 | test ppl   142.08
+| Percentile 95 | test loss  5.01 | test ppl   149.26
+| Percentile 99 | test loss  5.14 | test ppl   171.13
+| Percentile 100 | test loss  5.27 | test ppl   194.67
+| end of epoch   1 | time: 41.55s | valid loss 23.78 | valid ppl 21303184291.53
+| end of epoch   2 | time: 32.32s | valid loss 40.27 | valid ppl 309239299971534272.00
+| end of epoch   3 | time: 30.11s | valid loss  8.83 | valid ppl  6819.95
+| end of epoch   4 | time: 30.02s | valid loss  8.85 | valid ppl  6959.92
+| end of epoch   5 | time: 34.93s | valid loss  7.14 | valid ppl  1263.77
+| end of epoch   6 | time: 41.54s | valid loss  7.15 | valid ppl  1272.18
+| end of epoch   7 | time: 41.62s | valid loss  6.93 | valid ppl  1024.55
+| end of epoch   8 | time: 41.42s | valid loss  6.93 | valid ppl  1024.20
+| end of epoch   9 | time: 41.66s | valid loss  6.93 | valid ppl  1024.13
+| end of epoch  10 | time: 41.57s | valid loss  6.93 | valid ppl  1024.10
+| End of training | test loss  6.87 | test ppl   960.33
+| Percentile 20 | test loss  6.87 | test ppl   960.33
+| Percentile 40 | test loss  6.87 | test ppl   960.33
+| Percentile 60 | test loss  6.87 | test ppl   960.33
+| Percentile 80 | test loss  6.87 | test ppl   960.34
+| Percentile 90 | test loss  6.87 | test ppl   960.33
+| Percentile 95 | test loss  6.87 | test ppl   960.13
+| Percentile 99 | test loss  7.19 | test ppl  1328.29
+| Percentile 100 | test loss  8.44 | test ppl  4619.84
+| end of epoch   1 | time: 60.12s | valid loss 49.41 | valid ppl 2864474075122131009536.00
+| end of epoch   2 | time: 60.31s | valid loss 77.25 | valid ppl 3543590218515464509330740771553280.00
+| end of epoch   3 | time: 60.16s | valid loss  9.53 | valid ppl 13698.10
+| end of epoch   4 | time: 60.36s | valid loss 14.96 | valid ppl 3152531.57
+| end of epoch   5 | time: 60.32s | valid loss  7.22 | valid ppl  1372.95
+| end of epoch   6 | time: 60.19s | valid loss  7.30 | valid ppl  1483.36
+| End of training | test loss  7.14 | test ppl  1263.52
+| Percentile 20 | test loss  7.14 | test ppl  1263.52
+| Percentile 40 | test loss  7.14 | test ppl  1263.52
+| Percentile 60 | test loss  7.14 | test ppl  1263.50
+| Percentile 80 | test loss  7.14 | test ppl  1263.45
+| Percentile 90 | test loss  7.14 | test ppl  1262.35
+| Percentile 95 | test loss  7.14 | test ppl  1262.76
+| Percentile 99 | test loss 10.51 | test ppl 36679.58
+| Percentile 100 | test loss 11.50 | test ppl 98966.46
+| end of epoch   1 | time: 59.28s | valid loss 29.85 | valid ppl 9228369237758.33
+| end of epoch   2 | time: 59.24s | valid loss 33.99 | valid ppl 578656814705683.12
+| end of epoch   3 | time: 59.40s | valid loss 11.01 | valid ppl 60384.62
+| end of epoch   4 | time: 59.38s | valid loss 10.05 | valid ppl 23217.94
+| end of epoch   5 | time: 59.50s | valid loss 10.84 | valid ppl 51153.91
+| end of epoch   6 | time: 59.47s | valid loss  7.19 | valid ppl  1327.46
+| end of epoch   7 | time: 59.49s | valid loss  7.19 | valid ppl  1330.56
+| end of epoch   8 | time: 59.59s | valid loss  6.95 | valid ppl  1046.21
+| end of epoch   9 | time: 59.49s | valid loss  6.95 | valid ppl  1045.49
+| end of epoch  10 | time: 43.70s | valid loss  6.95 | valid ppl  1045.05
+| end of epoch  11 | time: 43.50s | valid loss  6.95 | valid ppl  1044.68
+| end of epoch  12 | time: 53.30s | valid loss  6.95 | valid ppl  1044.36
+| end of epoch  13 | time: 59.73s | valid loss  6.95 | valid ppl  1044.19
+| end of epoch  14 | time: 59.82s | valid loss  6.95 | valid ppl  1044.29
+| end of epoch  15 | time: 59.60s | valid loss  6.89 | valid ppl   984.44
+| End of training | test loss  6.83 | test ppl   926.16
+| Percentile 20 | test loss  6.83 | test ppl   926.26
+| Percentile 40 | test loss  6.83 | test ppl   926.51
+| Percentile 60 | test loss  6.83 | test ppl   927.26
+| Percentile 80 | test loss  6.83 | test ppl   926.67
+| Percentile 90 | test loss  6.83 | test ppl   926.53
+| Percentile 95 | test loss  6.86 | test ppl   951.48
+| Percentile 99 | test loss  7.02 | test ppl  1123.82
+| Percentile 100 | test loss  7.22 | test ppl  1367.75
