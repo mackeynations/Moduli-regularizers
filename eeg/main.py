@@ -28,13 +28,13 @@ parser.add_argument('--n_epochs',
                     default=10,
                     help='number of training epochs')
 parser.add_argument('--batch_size',
-                    default=20,
+                    default=128,
                     help='number of sequences used for each gradient step')
 parser.add_argument('--learning_rate',
                     default=1e-4,
                     help='gradient descent learning rate')
 parser.add_argument('--hidden_size',
-                    default=2048,
+                    default=1024,
                     help='number of grid cells')
 parser.add_argument('--RNN_type',
                     default='RNN',
@@ -89,10 +89,13 @@ parser.add_argument('--wavelet',
                    help = 'Try None, or db[k] for k an even integer')
 parser.add_argument('--decode_position',
                     default = 'final',
-                    help = 'Which RNN timesteps are used for decoding. Try final, parallel, attention, all.')
+                    help = 'Which RNN timesteps are used for decoding. Try final, parallel, attention, all, conv, conv_attn.')
 parser.add_argument('--sequence_length',
-                    default =None,
+                    default=None,
                     help = 'Automatically calculated, input does not modify results.')
+parser.add_argument('--bidirectional',
+                    default=False,
+                    help = 'Whether recurrent structure is bidirectional.')
 
 options = parser.parse_args()
 if options.wavelet != None:
@@ -216,7 +219,7 @@ try:
     
 except KeyboardInterrupt:
     print('=' * 81)
-    print('Exiting from training early. Test loss \& Percentile loss may be effected.')
+    print('Exiting from training early. Test loss and Percentile loss may be effected.')
     
 del model.reg
 del trainloader
