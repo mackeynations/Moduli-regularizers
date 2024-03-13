@@ -34,8 +34,8 @@ class SparseValidator(object):
             #h = tuple(each.data for each in h)
             
             output, h = self.model(w, x)
-            loss = self.criterion(output[:, -1, :], F.one_hot(y, num_classes=11).type(torch.float32))
-            _, pred = torch.max(output[:,-1,:], dim=1)
+            loss = self.criterion(output, F.one_hot(y, num_classes=11).type(torch.float32))
+            _, pred = torch.max(output, dim=1)
             
             num_correct += torch.sum(pred == y.data)
             
@@ -91,8 +91,8 @@ class PercentileSparse(object):
             #h = tuple(each.data for each in h)
             
             output, h = self.model(w, x)
-            loss = self.criterion(output[:, -1, :], F.one_hot(y, num_classes=11).type(torch.float32))
-            _, pred = torch.max(output[:,-1,:], dim=1)
+            loss = self.criterion(output, F.one_hot(y, num_classes=11).type(torch.float32))
+            _, pred = torch.max(output, dim=1)
             
             av_loss += loss.item()*x.size(0)
             num_correct += torch.sum(pred == y.data)

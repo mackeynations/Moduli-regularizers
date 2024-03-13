@@ -15,7 +15,7 @@ import gc
 #PYTORCH_NO_CUDA_MEMORY_CACHING=1
 #export PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:128
 
-from model import Chrysalis
+from model import Chrysalis, LSTM
 from trainer import Trainer
 import sparsevalid
 from torch.utils.data import Dataset, DataLoader, Subset
@@ -87,6 +87,12 @@ parser.add_argument('--num_params',
 parser.add_argument('--wavelet',
                     default=None,
                    help = 'Try None, or db[k] for k an even integer')
+parser.add_argument('--decode_position',
+                    default = 'final',
+                    help = 'Which RNN timesteps are used for decoding. Try final, parallel, attention, all.')
+parser.add_argument('--sequence_length',
+                    default =None,
+                    help = 'Automatically calculated, input does not modify results.')
 
 options = parser.parse_args()
 if options.wavelet != None:
@@ -96,14 +102,7 @@ print(f'Using device: {options.device}')
 
 
 
-if options.RNN_type == 'RNN':
-    model = Chrysalis(options)
-elif options.RNN_type == 'LSTM':
-    # model = LSTM(options)
-    raise NotImplementedError
 
-# Put model on GPU if using GPU
-model = model.to(options.device)
 
 def one_hot_encode(arr, n_labels):
     # Initialize the the encoded array
@@ -188,13 +187,37 @@ trainloader = DataLoader(dataset, batch_size = options.batch_size,
 valloader = DataLoader(dataset, batch_size = options.batch_size, 
                         num_workers=0, sampler = valid_sampler)
 
-                   
-                   
 
+
+# Get sequence length after transforms are applied                  
+k = 0
+for _, x, _, in trainloader:
+    if k > 0:
+        break
+    else:
+        options.sequence_length = x.shape[1]
+        k += 1                   
+
+        
+# Instantiate model
+if options.RNN_type == 'RNN':
+    model = Chrysalis(options)
+elif options.RNN_type == 'LSTM':
+    model = LSTM(options)
+
+# Put model on GPU if using GPU
+model = model.to(options.device)
+
+        
 # Train                   
 trainer = Trainer(options, model, trainloader, valloader)
-trainer.train()
-
+try: 
+    trainer.train()
+    
+except KeyboardInterrupt:
+    print('=' * 81)
+    print('Exiting from training early. Test loss \& Percentile loss may be effected.')
+    
 del model.reg
 del trainloader
 

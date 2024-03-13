@@ -15,6 +15,14 @@ def one_hot_encode(arr, n_labels):
     
     return one_hot
 
+def repackage_hidden(h):
+    """Wraps hidden states in new Tensors, to detach them from their history."""
+
+    if isinstance(h, torch.Tensor):
+        return h.detach()
+    else:
+        return tuple(repackage_hidden(v) for v in h)
+
 class Trainer(object):
     def __init__(self, options, model, dataloader, valloader):
         self.model = model
@@ -52,9 +60,9 @@ class Trainer(object):
             
             #Clone hidden values to prevent infinite backprop?
             #I've never fully understood this part
-            h = h.data
+            h = repackage_hidden(h)
             
-            loss = self.criterion(output[:, -1, :], F.one_hot(y, num_classes=11).type(torch.float32)) + self.weight_decay*self.model.regularizer()
+            loss = self.criterion(output, F.one_hot(y, num_classes=11).type(torch.float32)) + self.weight_decay*self.model.regularizer()
             loss.backward()
             nn.utils.clip_grad_norm_(self.model.parameters(), 5)
             self.optimizer.step()
@@ -81,9 +89,9 @@ class Trainer(object):
             #h = tuple(each.data for each in h)
             
             output, h = self.model(w, x)
-            loss = self.criterion(output[:, -1, :], F.one_hot(y, num_classes=11).type(torch.float32))
+            loss = self.criterion(output, F.one_hot(y, num_classes=11).type(torch.float32))
             
-            _, pred = torch.max(output[:,-1,:], dim=1)
+            _, pred = torch.max(output, dim=1)
             
             num_correct += torch.sum(pred == y.data)
             av_loss += loss.item()*x.size(0)
@@ -100,8 +108,8 @@ class Trainer(object):
             with torch.no_grad():
                 v, acc = self.val_step()
             sparsity = (torch.sum(torch.where(torch.abs(self.model.rnn.weight_hh_l0.data) < .001, 1.0, 0.0))/(self.model.hidden_size**2)).item()
-            print(''.join(['=' for i in range(66)]))
+            print('=' * 81)
             print("Epoch: {}. Train Loss: {:.3f}. Validation: {:.3f}. Accuracy: {:.3f}. Sparsity: {:.3f}".format(e, l, v, acc, sparsity))
-            print(''.join(['=' for i in range(66)]))
+            print('=' * 81)
             with open('Graphs/traindata/' + self.savefile + '.txt', 'a') as thefile:
                 thefile.write("Epoch: {}. Loss: {}. Validation: {}. Accuracy: {:.3f}. Sparsity: {}\n".format(e, l, v, acc, sparsity))
