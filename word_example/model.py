@@ -40,7 +40,9 @@ class RNNModel(nn.Module):
         self.rnn_type = rnn_type
         self.nhid = nhid
         self.nlayers = nlayers
-        self.reg = None
+        self.reg = {}
+        if args.bidirectional:
+            self.reg_reverse = {}
         self.get_regularizer(args)
         self.regtype = args.regtype
 
@@ -66,15 +68,31 @@ class RNNModel(nn.Module):
         else:
             return weight.new_zeros(self.nlayers, bsz, self.nhid)
     def get_regularizer(self, args):
-        reg = regularizer.regularizer(args)
-        if self.rnn_type == 'RNN_TANH':
-            self.reg = reg.reg
-        elif self.rnn_type =='LSTM':
-            self.reg = torch.cat((reg.reg, reg.reg, reg.reg, reg.reg), dim=0)
-        else:
-            raise Exception('Regularizers only implemented for rnn and lstm')
+        for i in range(args.nlayers):
+            m = regularizer.regularizer(args)
+            if args.bidirectional:
+                n = regularizer.regularizer(args)
+            if self.rnn_type == 'RNN_TANH' or self.rnn_type == 'RNN_RELU':
+                self.reg[i] = m.reg
+                if args.bidirectional:
+                    self.reg_reverse[i] = n.reg
+            elif self.rnn_type =='LSTM':
+                self.reg[i] = torch.cat((m.reg, m.reg, m.reg, m.reg), dim=0)
+                if args.bidirectional:
+                    self.reg_reverse[i] = torch.cat((n.reg, n.reg, n.reg, n.reg), dim=0)
+            elif self.rnn_type=='GRU':
+                self.reg[i] = torch.cat((m.reg, m.reg, m.reg), dim=0)
+                if args.bidirectional:
+                    self.reg_reverse[i] = torch.cat((n.reg, n.reg, n.reg), dim=0)
+            else:
+                raise Exception('Regularizers only implemented for rnn and lstm')
     def regularizer(self):
-        return torch.mean(self.reg*torch.abs(self.rnn.weight_hh_l0)**int(self.regtype))
+        r = 0
+        for i in range(self.nlayers):
+            r += torch.mean(self.reg[i]*torch.abs(getattr(self.rnn, 'weight_hh_l{}'.format(str(i))))**int(self.regtype))
+            #if self.bidirectional:
+            #    r += torch.mean(self.reg_reverse[i]*torch.abs(self.rnn.weight_hh_l[i]_reverse)**int(self.regtype))
+        return r
 
 # Temporarily leave PositionalEncoding module here. Will be moved somewhere else.
 class PositionalEncoding(nn.Module):

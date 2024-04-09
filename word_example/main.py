@@ -1,5 +1,7 @@
 # coding: utf-8
 # conda env: word_example
+
+
 import argparse
 import time
 import math
@@ -24,7 +26,7 @@ parser.add_argument('--emsize', type=int, default=200,
                     help='size of word embeddings')
 parser.add_argument('--nhid', type=int, default=200,
                     help='number of hidden units per layer')
-parser.add_argument('--nlayers', type=int, default=2,
+parser.add_argument('--nlayers', type=int, default=3,
                     help='number of layers')
 parser.add_argument('--lr', type=float, default=20,
                     help='initial learning rate')
@@ -82,11 +84,19 @@ parser.add_argument('--trainembed',
                     help = 'Whether embedding is registered, trained parameters. Not compatible with changeembed.')
 parser.add_argument('--savefile',
                     default='_loss_sets')
+parser.add_argument('--bidirectional',
+                    type=bool,
+                    default=False,
+                    help='Not implemented yet')
+parser.add_argument('--save_repo',
+                    default='',
+                    type=str)
 
 args = parser.parse_args()
 
 # Set the random seed manually for reproducibility.
-torch.manual_seed(args.seed)
+#n = int(args.savefile[-1])
+#torch.manual_seed(args.seed+n)
 if torch.cuda.is_available():
     if not args.cuda:
         print("WARNING: You have a CUDA device, so you should probably run with --cuda.")
@@ -180,6 +190,7 @@ def evaluate(data_source):
     # Turn on evaluation mode which disables dropout.
     model.eval()
     total_loss = 0.
+    num_correct = 0
     ntokens = len(corpus.dictionary)
     if args.model != 'Transformer':
         hidden = model.init_hidden(eval_batch_size)
@@ -193,7 +204,9 @@ def evaluate(data_source):
                 output, hidden = model(data, hidden)
                 hidden = repackage_hidden(hidden)
             total_loss += len(data) * criterion(output, targets).item()
-    return total_loss / (len(data_source) - 1)
+            _, pred = torch.max(output, dim=1)
+            num_correct += torch.sum(pred==targets.data)
+    return total_loss / (len(data_source) - 1), num_correct/(len(data)*(len(data_source)-1))
 
 
 def train():
@@ -215,7 +228,7 @@ def train():
         else:
             hidden = repackage_hidden(hidden)
             output, hidden = model(data, hidden)
-        loss = criterion(output, targets) #+ args.weight_decay*model.regularizer()
+        loss = criterion(output, targets) + args.weight_decay*model.regularizer()
         loss.backward()
 
         # `clip_grad_norm` helps prevent the exploding gradient problem in RNNs / LSTMs.
@@ -255,14 +268,14 @@ try:
     for epoch in range(1, args.epochs+1):
         epoch_start_time = time.time()
         train()
-        val_loss = evaluate(val_data)
+        val_loss, acc = evaluate(val_data)
         print('-' * 89)
         print('| end of epoch {:3d} | time: {:5.2f}s | valid loss {:5.2f} | '
-                'valid ppl {:8.2f}'.format(epoch, (time.time() - epoch_start_time),
-                                           val_loss, math.exp(val_loss)))
+                'valid ppl {:8.2f} | accuracy {:4f}'.format(epoch, (time.time() - epoch_start_time),
+                                           val_loss, math.exp(val_loss), acc))
         print('-' * 89)
         # Save the model if the validation loss is the best we've seen so far.
-        with open('Graphs/traindata/' + args.savefile + '.txt', 'a') as thefile:
+        with open('Graphs/traindata/' + args.save_repo + args.savefile + '.txt', 'a') as thefile:
             thefile.write('| end of epoch {:3d} | time: {:5.2f}s | valid loss {:5.2f} | '
                 'valid ppl {:8.2f}\n'.format(epoch, (time.time() - epoch_start_time),
                                            val_loss, math.exp(val_loss)))
@@ -288,11 +301,11 @@ with open(args.save, 'rb') as f:
         model.rnn.flatten_parameters()
 
 # Run on test data.
-test_loss = evaluate(test_data)
+test_loss, acc = evaluate(test_data)
 print('=' * 89)
-print('| End of training | test loss {:5.2f} | test ppl {:8.2f}'.format(
-    test_loss, math.exp(test_loss)))
-with open('Graphs/traindata/' + args.savefile + '.txt', 'a') as thefile:
+print('| End of training | test loss {:5.2f} | test ppl {:8.2f} | accuracy {:4f}'.format(
+    test_loss, math.exp(test_loss), acc))
+with open('Graphs/traindata/' +args.save_repo + args.savefile + '.txt', 'a') as thefile:
     thefile.write('| End of training | test loss {:5.2f} | test ppl {:8.2f}\n'.format(
     test_loss, math.exp(test_loss)))
 print('=' * 89)
@@ -301,19 +314,33 @@ for p in [20, 40, 60, 80, 90, 95, 99, 100]:
     with open(args.save, 'rb') as f:
         model = torch.load(f)
         model.rnn.flatten_parameters
-    #prune.l1_unstructured(model.rnn, 'weight_hh_l0', amount = float(p)/100)
+    #for k in range(args.nlayers):
+    #    prune.l1_unstructured(model.rnn, 'weight_hh_l{}'.format(str(k)), amount = float(p)/100)
+      
+    myparams = ((model.rnn, 'weight_hh_l0'),
+                (model.rnn, 'weight_ih_l0'),
+                (model.rnn, 'weight_hh_l1'),
+                (model.rnn, 'weight_ih_l1'),
+                (model.rnn, 'weight_hh_l2'),
+                (model.rnn, 'weight_ih_l2'),
+                (model.encoder, 'weight'),
+                (model.decoder, 'weight'))
+    prune.global_unstructured(myparams, 
+                              pruning_method = prune.L1Unstructured,
+                              amount=float(p)/100)
+                              
     #prune.remove(model.rnn, 'weight_hh_l0')
     #doub = torch.sum(torch.where(torch.abs(model.rnn.weight_hh_l0.data) == 0, 1.0, 0.0))/(args.nhid**2)
-    attr = torch.abs(model.rnn.weight_hh_l0.data).cpu().view(-1)
-    cutoff = np.percentile(attr, p)
+    #attr = torch.abs(model.rnn.weight_hh_l0.data).cpu().view(-1)
+    #cutoff = np.percentile(attr, p)
     #m = 5*torch.rand(4*args.nhid, args.nhid).to('cuda')
-    model.rnn.weight_hh_l0.data = torch.where(torch.abs(model.rnn.weight_hh_l0.data) < cutoff, 0.0, model.rnn.weight_hh_l0.data)
-    test_loss = evaluate(test_data)
-    print('| Percentile {} | test loss {:5.2f} | test ppl {:8.2f}'.format(
-    p, test_loss, math.exp(test_loss)))
-    with open('Graphs/traindata/' + args.savefile + '.txt', 'a') as thefile:
-        thefile.write('| Percentile {} | test loss {:5.2f} | test ppl {:8.2f}\n'.format(
-    p, test_loss, math.exp(test_loss)))
+    #model.rnn.weight_hh_l0.data = torch.where(torch.abs(model.rnn.weight_hh_l0.data) < cutoff, 0.0, model.rnn.weight_hh_l0.data)
+    test_loss, acc = evaluate(test_data)
+    print('| Percentile {} | test loss {:5.2f} | test ppl {:8.2f} | accuracy {:4f}'.format(
+    p, test_loss, math.exp(test_loss), acc))
+    with open('Graphs/traindata/' + args.save_repo + args.savefile + '.txt', 'a') as thefile:
+        thefile.write('| Percentile {} | test loss {:5.2f} | test ppl {:8.2f} | accuracy {:6f}\n'.format(
+    p, test_loss, math.exp(test_loss), acc))
 
 if len(args.onnx_export) > 0:
     # Export the model in ONNX format.
