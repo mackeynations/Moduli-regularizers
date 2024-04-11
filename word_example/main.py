@@ -11,7 +11,7 @@ import torch.nn as nn
 import torch.nn.utils.prune as prune
 import torch.nn.functional as F
 import torch.onnx
-import sparsevalid
+import sparsevalid_total as sparsevalid
 import numpy as np
 
 import data
@@ -89,8 +89,11 @@ parser.add_argument('--bidirectional',
                     default=False,
                     help='Not implemented yet')
 parser.add_argument('--save_repo',
-                    default='',
+                    default='TotalRNNNew/',
                     type=str)
+parser.add_argument('--target_perc',
+                    default=90,
+                    type=float)
 
 args = parser.parse_args()
 
@@ -267,18 +270,32 @@ best_val_loss = None
 try:
     for epoch in range(1, args.epochs+1):
         epoch_start_time = time.time()
+        
+        myparams = [(model.encoder, 'weight'), (model.decoder, 'weight')] 
+        myparams += [(model.rnn, 'weight_hh_l{}'.format(i)) for i in range(args.nlayers)]
+        myparams += [(model.rnn, 'weight_ih_l{}'.format(i)) for i in range(args.nlayers)]
+        myparams = tuple(myparams)
+        if epoch > 2:
+            for a, b in myparams:
+                prune.remove(a, b)
+        amt = args.target_perc*(epoch)/(100*args.epochs)
+        if epoch > 1:
+            prune.global_unstructured(myparams,
+                                      pruning_method = prune.L1Unstructured,
+                                      amount=amt)
+            
         train()
         val_loss, acc = evaluate(val_data)
         print('-' * 89)
-        print('| end of epoch {:3d} | time: {:5.2f}s | valid loss {:5.2f} | '
-                'valid ppl {:8.2f} | accuracy {:4f}'.format(epoch, (time.time() - epoch_start_time),
-                                           val_loss, math.exp(val_loss), acc))
+        print('| end of epoch {:3d} | Percentile {:3f} | time: {:5.2f}s | valid loss {:5.2f} | '
+                'accuracy {:4f}'.format(epoch, amt, (time.time() - epoch_start_time),
+                                           val_loss, acc))
         print('-' * 89)
         # Save the model if the validation loss is the best we've seen so far.
         with open('Graphs/traindata/' + args.save_repo + args.savefile + '.txt', 'a') as thefile:
-            thefile.write('| end of epoch {:3d} | time: {:5.2f}s | valid loss {:5.2f} | '
-                'valid ppl {:8.2f}\n'.format(epoch, (time.time() - epoch_start_time),
-                                           val_loss, math.exp(val_loss)))
+            thefile.write('| end of epoch {:3d} | Percentile: {:3f} | time: {:5.2f}s | valid loss {:5.2f} | '
+                'accuracy {:4f}\n'.format(epoch, amt, (time.time() - epoch_start_time),
+                                           val_loss, acc))
         if not best_val_loss or val_loss < best_val_loss:
             with open(args.save, 'wb') as f:
                 torch.save(model, f)
@@ -293,7 +310,7 @@ except KeyboardInterrupt:
 
 # Load the best saved model.
 with open(args.save, 'rb') as f:
-    model = torch.load(f)
+    #model = torch.load(f)
     # after load the rnn params are not a continuous chunk of memory
     # this makes them a continuous chunk, and will speed up forward pass
     # Currently, only rnn model supports flatten_parameters function.
@@ -303,13 +320,64 @@ with open(args.save, 'rb') as f:
 # Run on test data.
 test_loss, acc = evaluate(test_data)
 print('=' * 89)
-print('| End of training | test loss {:5.2f} | test ppl {:8.2f} | accuracy {:4f}'.format(
-    test_loss, math.exp(test_loss), acc))
+print('| End of training 1 | Percentile {} | test loss {:5.2f} | accuracy {:4f}'.format(
+    amt, test_loss, acc))
 with open('Graphs/traindata/' +args.save_repo + args.savefile + '.txt', 'a') as thefile:
-    thefile.write('| End of training | test loss {:5.2f} | test ppl {:8.2f}\n'.format(
-    test_loss, math.exp(test_loss)))
+    thefile.write('| End of training 1 | Percentile {} | test loss {:5.2f} | accuracy {:4f}\n'.format(
+    amt, test_loss, acc))
 print('=' * 89)
 
+try:
+    for epoch in range(args.epochs+1, args.epochs+6):
+        epoch_start_time = time.time()
+        
+        myparams = [(model.encoder, 'weight'), (model.decoder, 'weight')] 
+        myparams += [(model.rnn, 'weight_hh_l{}'.format(i)) for i in range(args.nlayers)]
+        myparams += [(model.rnn, 'weight_ih_l{}'.format(i)) for i in range(args.nlayers)]
+        myparams = tuple(myparams)
+        if epoch > 2:
+            for a, b in myparams:
+                prune.remove(a, b)
+        amt = .9+.08*(epoch-args.epochs)/5
+        if epoch > 1:
+            prune.global_unstructured(myparams,
+                                      pruning_method = prune.L1Unstructured,
+                                      amount=amt)
+            
+        train()
+        val_loss, acc = evaluate(val_data)
+        print('-' * 89)
+        print('| end of epoch {:3d} | Percentile {:3f} | time: {:5.2f}s | valid loss {:5.2f} | '
+                'accuracy {:4f}'.format(epoch, amt, (time.time() - epoch_start_time),
+                                           val_loss, acc))
+        print('-' * 89)
+        # Save the model if the validation loss is the best we've seen so far.
+        with open('Graphs/traindata/' + args.save_repo + args.savefile + '.txt', 'a') as thefile:
+            thefile.write('| end of epoch {:3d} | Percentile: {:3f} | time: {:5.2f}s | valid loss {:5.2f} | '
+                'accuracy {:4f}\n'.format(epoch, amt, (time.time() - epoch_start_time),
+                                           val_loss, acc))
+        if not best_val_loss or val_loss < best_val_loss:
+            with open(args.save, 'wb') as f:
+                torch.save(model, f)
+            best_val_loss = val_loss
+        else:
+            # Anneal the learning rate if no improvement has been seen in the validation dataset.
+            lr /= 4.0
+            
+except KeyboardInterrupt:
+    print('-' * 89)
+    print('Exiting from second training early')            
+            
+model.rnn.flatten_parameters()
+print('=' * 89)
+print('| End of training 2 | Percentile {} | test loss {:5.2f} | accuracy {:4f}'.format(
+    amt, test_loss, acc))
+with open('Graphs/traindata/' +args.save_repo + args.savefile + '.txt', 'a') as thefile:
+    thefile.write('| End of training 2 | Percentile {} | test loss {:5.2f} | accuracy {:4f}\n'.format(
+    amt, test_loss, acc))
+print('=' * 89)
+
+'''
 for p in [20, 40, 60, 80, 90, 95, 99, 100]:
     with open(args.save, 'rb') as f:
         model = torch.load(f)
@@ -325,6 +393,9 @@ for p in [20, 40, 60, 80, 90, 95, 99, 100]:
                 (model.rnn, 'weight_ih_l2'),
                 (model.encoder, 'weight'),
                 (model.decoder, 'weight'))
+    for a, b in myparams:
+        prune.remove(a, b) 
+        
     prune.global_unstructured(myparams, 
                               pruning_method = prune.L1Unstructured,
                               amount=float(p)/100)
@@ -345,3 +416,4 @@ for p in [20, 40, 60, 80, 90, 95, 99, 100]:
 if len(args.onnx_export) > 0:
     # Export the model in ONNX format.
     export_onnx(args.onnx_export, batch_size=1, seq_len=args.bptt)
+'''

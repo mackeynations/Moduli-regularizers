@@ -15,6 +15,7 @@ class SparseValidator(object):
         self.savefile = options.savefile
         self.trajectory_generator = trajectory_generator
         self.save_repo = options.save_repo
+        self.target_perc = options.target_perc
 
         self.loss = []
         self.err = []
@@ -36,8 +37,8 @@ class SparseValidator(object):
         '''
         self.model.eval()
         self.model.RNN.weight_hh_l0.data = torch.where(torch.abs(self.model.RNN.weight_hh_l0.data) < .001, 0.0, self.model.RNN.weight_hh_l0.data)
-
-        loss, err, cat10, cat20, cat50 = self.model.compute_loss(inputs, pc_outputs, pos, options)
+        with torch.no_grad():
+            loss, err, cat10, cat20, cat50 = self.model.compute_loss(inputs, pc_outputs, pos, options)
 
 
         return loss.item(), err.item(), cat10.item(), cat20.item(), cat50.item()
@@ -65,11 +66,11 @@ class SparseValidator(object):
                 # Log error rate to progress bar
                 # tbar.set_description('Error = ' + str(np.int(100*err)) + 'cm')
                 sparsity = (torch.sum(torch.where(torch.abs(self.model.RNN.weight_hh_l0.data) < .001, 1.0, 0.0))/(self.Ng**2)).item()
-                print('Validator: Step: {}. Loss: {}. Err: {}cm, Sparsity: {:3f}.'.format(
-                        step_idx,
+                print('Validator: Target: {}. Step: {}. Loss: {}. Err: {}cm, Sparsity: {:3f}.'.format(
+                        self.target_perc, step_idx,
                         np.round(loss, 3), np.round(100 * err, 2), sparsity))
                 with open(self.save_repo + self.savefile + '.txt', 'a') as the_file:
-                    the_file.write('Validator: Step: {}. Loss: {}. Err: {}cm. Sparsity: {:3f}\n'.format(step_idx, np.round(loss, 3), np.round(100 * err, 2), sparsity))
+                    the_file.write('Validator: Target: {}. Step: {}. Loss: {}. Err: {}cm. Sparsity: {:3f}\n'.format(self.target_perc, step_idx, np.round(loss, 3), np.round(100 * err, 2), sparsity))
 
             if save:
                 # Save checkpoint

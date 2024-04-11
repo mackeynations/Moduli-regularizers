@@ -74,7 +74,7 @@ class PercentileSparse(object):
                     (self.model.rnn, 'weight_ih_l2'),
                     (self.model.encoder, 'weight'),
                     (self.model.decoder, 'weight'))
-        prune.global_unstructured(params_to_prune, 
+        prune.global_unstructured(myparams, 
                                   pruning_method = prune.L1Unstructured,
                                   amount=percentile/100)
 

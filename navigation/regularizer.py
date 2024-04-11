@@ -72,7 +72,6 @@ class regularizer(object):
         self.regpower = options.regpower
         self.changeembed = options.changeembed
         self.trainembed = options.trainembed
-        self.dog_ablation = options.dog_ablation
         self.embed = embed
         if self.trainembed:
             self.generate2()

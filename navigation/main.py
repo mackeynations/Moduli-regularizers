@@ -41,7 +41,8 @@ parser.add_argument('--sequence_length',
                     default=50,
                     help='number of steps in trajectory')
 parser.add_argument('--learning_rate',
-                    default=1e-4,
+                    default=5e-5,
+                    type=float,
                     help='gradient descent learning rate')
 parser.add_argument('--Np',
                     default=512,
@@ -108,9 +109,9 @@ parser.add_argument('--invert',
 parser.add_argument('--trainembed',
                     default = False,
                     help = 'Whether embedding is registered, trained parameters. Not compatible with changeembed.')
-parser.add_argument('--dog_ablation',
+parser.add_argument('--target_perc',
                     type=float,
-                    default=2)
+                    default=90)
 
 options = parser.parse_args()
 options.run_ID = generate_run_ID(options)
@@ -142,15 +143,18 @@ trainer.train(options, n_epochs=options.n_epochs, n_steps=options.n_steps)
 
 # Validate Sparseness
 trajectory_generator2 = TrajectoryGenerator(options, place_cells)
-model.load_state_dict(torch.load('models/bestachieved' + options.savefile + '.pt'))
+#model.load_state_dict(torch.load('models/bestachieved' + options.savefile + '.pt'))
 valid = sparsevalid.SparseValidator(options, model, trajectory_generator2)
 valid.test(options, n_epochs = 1, n_steps = 5)
-for p in [20, 40, 60, 80, 90, 95]:
-    model = RNN(options, place_cells).to(options.device)
-    model.load_state_dict(torch.load('models/bestachieved' + options.savefile + '.pt'))
-    validp = sparsevalid.PercentileSparse(options, model, trajectory_generator2, p)
-    validp.test(options, n_epochs=1, n_steps=5)
+#for p in [20, 40, 60, 80, 90, 95]:
+#    model = RNN(options, place_cells).to(options.device)
+#    model.load_state_dict(torch.load('models/bestachieved' + options.savefile + '.pt'))
+#    validp = sparsevalid.PercentileSparse(options, model, trajectory_generator2, p)
+#    validp.test(options, n_epochs=1, n_steps=5)
 
-                            
+# Increase to 98% sparsity
+options.target_perc = float(98)
+trainer.train2(options, n_epochs=5, n_steps=options.n_steps)
+valid = sparsevalid.SparseValidator(options, model, trajectory_generator2)
 
                             

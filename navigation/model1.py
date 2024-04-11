@@ -30,6 +30,7 @@ class RNN(torch.nn.Module):
         self.decoder = torch.nn.Linear(self.Ng, self.Np, bias=False)
         
         self.softmax = torch.nn.Softmax(dim=-1)
+        self.logsoftmax = torch.nn.LogSoftmax(dim=-1)
         
         self.trainembed = options.trainembed
         if self.trainembed == False:
@@ -87,12 +88,19 @@ class RNN(torch.nn.Module):
         y = pc_outputs
         preds = self.predict(inputs)
         yhat = self.softmax(self.predict(inputs))
-        loss = -(y*torch.log(yhat)).sum(-1).mean()
+        yhat2 = self.logsoftmax(self.predict(inputs))
+        #loss = -(y*torch.log(yhat)).sum(-1).mean()
+        loss = -(y*yhat2).sum(-1).mean()
+        #criterion = torch.nn.NLLLoss()
+        #loss = criterion(yhat, y)
 
         # Weight regularization 
         if self.trainembed:
             self.reg = regularizer.regularizer(options, self.embed)
         loss += (self.weight_decay*self.reg.reg.to(self.device)*(torch.abs(self.RNN.weight_hh_l0)**self.regtype)).mean()
+        #loss += .001*torch.mean(torch.abs(self.RNN.weight_ih_l0))
+        #loss += .001*torch.mean(torch.abs(self.encoder.weight))
+        #loss += .001*torch.mean(torch.abs(self.decoder.weight))
 
         
         # Compute decoding error
