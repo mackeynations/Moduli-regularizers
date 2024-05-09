@@ -104,7 +104,7 @@ parser.add_argument('--regtype',
 parser.add_argument('--savefile',
                     default='_loss_sets')
 parser.add_argument('--save_repo',
-                    default='Graphs/Lottery/',
+                    default='Graphs/trainembed/',
                     help='Folder the save file goes into')
 parser.add_argument('--invert',
                     default = False,
@@ -150,7 +150,7 @@ elapsed = time.time() - start_train
 with open(options.save_repo + options.savefile + '.txt', 'a') as the_file:
     the_file.write('TOTAL TRAINING TIME: {}\n'.format(elapsed))
 if options.trainembed:
-    torch.save(model.reg, 'models/embeddings/' + self.savefile + '.pt')
+    torch.save(model.reg, 'models/embeddings/' + options.savefile + '.pt')
     
 
 # Validate Sparseness

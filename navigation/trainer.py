@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import torch
+import torch.nn as nn
 import numpy as np
 from math import isnan
 import gc
@@ -65,7 +66,7 @@ class Trainer(object):
         
         if self.options.trainembed == True:
             if self.options.regularizer == 's3':
-                self.model.embed = self.model.embed/torch.linalg.norm(self.model.embed, dim=1, keepdim=True)
+                self.model.embed = nn.Parameter(self.model.embed/torch.linalg.norm(self.model.embed, dim=1, keepdim=True))
             elif self.options.regularizer == 'torus':
                 pass
             else: 
