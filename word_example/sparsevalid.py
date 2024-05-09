@@ -65,7 +65,7 @@ class PercentileSparse(object):
         self.err = []
         
     def get_mask(self):
-        prune.l1_unstructured(self.model.rnn, 'weight_hh_l0', amount = int(self.percentile*self.hidden_size**2))
+        prune.l1_unstructured(self.model.rnn, 'weight_hh_l0', amount = self.percentile/100)
 
     
     def val_step(self):

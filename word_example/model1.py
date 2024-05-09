@@ -90,9 +90,12 @@ class RNNModel(nn.Module):
         r = 0
         for i in range(self.nlayers):
             r += torch.mean(self.reg[i]*torch.abs(getattr(self.rnn, 'weight_hh_l{}'.format(str(i))))**int(self.regtype))
+            r += torch.mean(torch.abs(getattr(self.rnn, 'weight_ih_l{}'.format(str(i)))))
             #if self.bidirectional:
             #    r += torch.mean(self.reg_reverse[i]*torch.abs(self.rnn.weight_hh_l[i]_reverse)**int(self.regtype))
-        return r
+        r += torch.mean(torch.abs(self.decoder.weight))
+        r += torch.mean(torch.abs(self.encoder.weight)) 
+        return r 
 
 # Temporarily leave PositionalEncoding module here. Will be moved somewhere else.
 class PositionalEncoding(nn.Module):

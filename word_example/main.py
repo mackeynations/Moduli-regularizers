@@ -15,7 +15,7 @@ import sparsevalid_total as sparsevalid
 import numpy as np
 
 import data
-import model
+import model1
 
 parser = argparse.ArgumentParser(description='PyTorch Wikitext-2 RNN/LSTM/GRU/Transformer Language Model')
 parser.add_argument('--data', type=str, default='./data/wikitext-2',
@@ -60,6 +60,7 @@ parser.add_argument('--dry-run', action='store_true',
                     help='verify the code and the model')
 parser.add_argument('--weight_decay',
                     default=1e-1,
+                    type=float,
                     help='strength of weight decay on recurrent weights')
 parser.add_argument('--regularizer',
                     default='none',
@@ -89,7 +90,7 @@ parser.add_argument('--bidirectional',
                     default=False,
                     help='Not implemented yet')
 parser.add_argument('--save_repo',
-                    default='TotalRNNNew/',
+                    default='Ablation/',
                     type=str)
 parser.add_argument('--target_perc',
                     default=90,
@@ -153,9 +154,9 @@ test_data = batchify(corpus.test, eval_batch_size)
 
 ntokens = len(corpus.dictionary)
 if args.model == 'Transformer':
-    model = model.TransformerModel(ntokens, args.emsize, args.nhead, args.nhid, args.nlayers, args.dropout).to(device)
+    model = model1.TransformerModel(ntokens, args.emsize, args.nhead, args.nhid, args.nlayers, args.dropout).to(device)
 else:
-    model = model.RNNModel(args, args.model, ntokens, args.emsize, args.nhid, args.nlayers, args.dropout, args.tied).to(device)
+    model = model1.RNNModel(args, args.model, ntokens, args.emsize, args.nhid, args.nlayers, args.dropout, args.tied).to(device)
 
 criterion = nn.NLLLoss()
 
@@ -268,6 +269,7 @@ best_val_loss = None
 
 # At any point you can hit Ctrl + C to break out of training early.
 try:
+    train_start = time.time()
     for epoch in range(1, args.epochs+1):
         epoch_start_time = time.time()
         
@@ -296,9 +298,13 @@ try:
             thefile.write('| end of epoch {:3d} | Percentile: {:3f} | time: {:5.2f}s | valid loss {:5.2f} | '
                 'accuracy {:4f}\n'.format(epoch, amt, (time.time() - epoch_start_time),
                                            val_loss, acc))
+        if epoch > 1:
+            print(model.rnn.weight_hh_l0_mask.mean())
+        #if not best_val_loss or val_loss < best_val_loss:
+        with open(args.save, 'wb') as f:
+            torch.save(model.state_dict(), f)
+            #best_val_loss = val_loss
         if not best_val_loss or val_loss < best_val_loss:
-            with open(args.save, 'wb') as f:
-                torch.save(model, f)
             best_val_loss = val_loss
         else:
             # Anneal the learning rate if no improvement has been seen in the validation dataset.
@@ -307,10 +313,34 @@ try:
 except KeyboardInterrupt:
     print('-' * 89)
     print('Exiting from training early')
+    
+# Run on test data.
+elapsed = time.time() - train_start
+test_loss, acc = evaluate(test_data)
+print('=' * 89)
+print('| End of training 1 | Percentile {} | test loss {:5.2f} | accuracy {:4f}'.format(
+    amt, test_loss, acc))
+with open('Graphs/traindata/' +args.save_repo + args.savefile + '.txt', 'a') as thefile:
+    thefile.write('| End of training 1 | Percentile {} | test loss {:5.2f} | accuracy {:4f} | training time {} \n'.format(
+    amt, test_loss, acc, elapsed))
+print('=' * 89)
 
-# Load the best saved model.
+
+# Load lottery ticket sparse structure
 with open(args.save, 'rb') as f:
-    #model = torch.load(f)
+    model = model1.RNNModel(args, args.model, ntokens, args.emsize, args.nhid, args.nlayers, args.dropout, args.tied).to(device)
+    myparams = [(model.encoder, 'weight'), (model.decoder, 'weight')] 
+    myparams += [(model.rnn, 'weight_hh_l{}'.format(i)) for i in range(args.nlayers)]
+    myparams += [(model.rnn, 'weight_ih_l{}'.format(i)) for i in range(args.nlayers)]
+    myparams = tuple(myparams)
+    prune.global_unstructured(myparams,
+                              pruning_method = prune.L1Unstructured,
+                              amount=.5)
+        
+    wts = torch.load(f)
+    model_dict = model.state_dict()
+    wts_trimmed = {k:v for k, v in wts.items() if k.endswith('mask')}
+    model.load_state_dict(wts_trimmed, strict=False)
     # after load the rnn params are not a continuous chunk of memory
     # this makes them a continuous chunk, and will speed up forward pass
     # Currently, only rnn model supports flatten_parameters function.
@@ -320,30 +350,18 @@ with open(args.save, 'rb') as f:
 # Run on test data.
 test_loss, acc = evaluate(test_data)
 print('=' * 89)
-print('| End of training 1 | Percentile {} | test loss {:5.2f} | accuracy {:4f}'.format(
+print('| Start of lottery training | Percentile {} | test loss {:5.2f} | accuracy {:4f}'.format(
     amt, test_loss, acc))
 with open('Graphs/traindata/' +args.save_repo + args.savefile + '.txt', 'a') as thefile:
-    thefile.write('| End of training 1 | Percentile {} | test loss {:5.2f} | accuracy {:4f}\n'.format(
+    thefile.write('| Start of lottery | Percentile {} | test loss {:5.2f} | accuracy {:4f}\n'.format(
     amt, test_loss, acc))
 print('=' * 89)
 
 try:
-    for epoch in range(args.epochs+1, args.epochs+6):
+    start_lottery = time.time()
+    lr = 20.0
+    for epoch in range(1, args.epochs+1):
         epoch_start_time = time.time()
-        
-        myparams = [(model.encoder, 'weight'), (model.decoder, 'weight')] 
-        myparams += [(model.rnn, 'weight_hh_l{}'.format(i)) for i in range(args.nlayers)]
-        myparams += [(model.rnn, 'weight_ih_l{}'.format(i)) for i in range(args.nlayers)]
-        myparams = tuple(myparams)
-        if epoch > 2:
-            for a, b in myparams:
-                prune.remove(a, b)
-        amt = .9+.08*(epoch-args.epochs)/5
-        if epoch > 1:
-            prune.global_unstructured(myparams,
-                                      pruning_method = prune.L1Unstructured,
-                                      amount=amt)
-            
         train()
         val_loss, acc = evaluate(val_data)
         print('-' * 89)
@@ -366,54 +384,15 @@ try:
             
 except KeyboardInterrupt:
     print('-' * 89)
-    print('Exiting from second training early')            
-            
-model.rnn.flatten_parameters()
+    print('Exiting from second training early')  
+    
+# Run on test data.
+elapsed = time.time() - start_lottery
+test_loss, acc = evaluate(test_data)
 print('=' * 89)
-print('| End of training 2 | Percentile {} | test loss {:5.2f} | accuracy {:4f}'.format(
+print('| End of lottery | Percentile {} | test loss {:5.2f} | accuracy {:4f}'.format(
     amt, test_loss, acc))
 with open('Graphs/traindata/' +args.save_repo + args.savefile + '.txt', 'a') as thefile:
-    thefile.write('| End of training 2 | Percentile {} | test loss {:5.2f} | accuracy {:4f}\n'.format(
-    amt, test_loss, acc))
+    thefile.write('| End of lottery | Percentile {} | test loss {:5.2f} | accuracy {:4f} | lottery time {}\n'.format(
+    amt, test_loss, acc, elapsed))
 print('=' * 89)
-
-'''
-for p in [20, 40, 60, 80, 90, 95, 99, 100]:
-    with open(args.save, 'rb') as f:
-        model = torch.load(f)
-        model.rnn.flatten_parameters
-    #for k in range(args.nlayers):
-    #    prune.l1_unstructured(model.rnn, 'weight_hh_l{}'.format(str(k)), amount = float(p)/100)
-      
-    myparams = ((model.rnn, 'weight_hh_l0'),
-                (model.rnn, 'weight_ih_l0'),
-                (model.rnn, 'weight_hh_l1'),
-                (model.rnn, 'weight_ih_l1'),
-                (model.rnn, 'weight_hh_l2'),
-                (model.rnn, 'weight_ih_l2'),
-                (model.encoder, 'weight'),
-                (model.decoder, 'weight'))
-    for a, b in myparams:
-        prune.remove(a, b) 
-        
-    prune.global_unstructured(myparams, 
-                              pruning_method = prune.L1Unstructured,
-                              amount=float(p)/100)
-                              
-    #prune.remove(model.rnn, 'weight_hh_l0')
-    #doub = torch.sum(torch.where(torch.abs(model.rnn.weight_hh_l0.data) == 0, 1.0, 0.0))/(args.nhid**2)
-    #attr = torch.abs(model.rnn.weight_hh_l0.data).cpu().view(-1)
-    #cutoff = np.percentile(attr, p)
-    #m = 5*torch.rand(4*args.nhid, args.nhid).to('cuda')
-    #model.rnn.weight_hh_l0.data = torch.where(torch.abs(model.rnn.weight_hh_l0.data) < cutoff, 0.0, model.rnn.weight_hh_l0.data)
-    test_loss, acc = evaluate(test_data)
-    print('| Percentile {} | test loss {:5.2f} | test ppl {:8.2f} | accuracy {:4f}'.format(
-    p, test_loss, math.exp(test_loss), acc))
-    with open('Graphs/traindata/' + args.save_repo + args.savefile + '.txt', 'a') as thefile:
-        thefile.write('| Percentile {} | test loss {:5.2f} | test ppl {:8.2f} | accuracy {:6f}\n'.format(
-    p, test_loss, math.exp(test_loss), acc))
-
-if len(args.onnx_export) > 0:
-    # Export the model in ONNX format.
-    export_onnx(args.onnx_export, batch_size=1, seq_len=args.bptt)
-'''
