@@ -3,7 +3,7 @@
 ###################################################
 
 
-This directory contains all files needed to replicate the NLP experiments in our paper "Geometric sparsification in recurrent neural nets." (link to be posted) The experiments conducted in our paper can most easily be replicated by running the shell script multiruns.sh. This shell script will train 5 models using a variety of moduli regularizers and inhibitor functions, as well as all control experiments, at a set level of sparsity. The output consists of the following:
+This directory contains all files needed to replicate the NLP experiments in our paper "Geometric sparsification in recurrent neural nets." (link to be posted) We recommend running our code in a separate conda environment. The packages we used, and their version numbers, can be found in requirements.txt. The experiments conducted in our paper can most easily be replicated by running the shell script multiruns.sh. This shell script will train 5 models using a variety of moduli regularizers and inhibitor functions, as well as all control experiments, at a set level of sparsity. The output consists of the following:
  1. The validation loss and accuracy of the model at each epoch, as well as the level of trained sparsity
  2. The final test loss & accuracy of the model
  3. The validation loss and accuracy of the "lottery ticket" model with randomized weights, but identical sparse structure

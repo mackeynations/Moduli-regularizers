@@ -3,7 +3,7 @@
 ###################################################
 
 
-This directory contains all files needed to replicate the Navigation experiments in our paper "Geometric sparsification in recurrent neural nets." (link to be posted) The experiments conducted in our paper can most easily be replicated by running the shell script multiruns.sh. This shell script will train 5 models using a variety of moduli regularizers and inhibitor functions, as well as all control experiments, at a set level of sparsity. The output consists of the following:
+This directory contains all files needed to replicate the Navigation experiments in our paper "Geometric sparsification in recurrent neural nets." (link to be posted) We recommend creating a python environment in conda for our experiments; the list of all packages and versions we used can be found in "requirements.txt". The experiments conducted in our paper can most easily be replicated by running the shell script multiruns.sh. This shell script will train 5 models using a variety of moduli regularizers and inhibitor functions, as well as all control experiments, at a set level of sparsity. The output consists of the following:
  1. The training loss every 100 steps while the model is being sparsified
  2. A sequence of five Validators: these are copies of the final model over 5 x (batch size) routes, which we averaged to report the final model error
  3. The training loss every 100 steps for the "lottery ticket" model with randomized weights, but identical sparse structure
