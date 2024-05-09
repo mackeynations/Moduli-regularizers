@@ -139,18 +139,35 @@ class regularizer(object):
             self.reg = torus_distance(embed1, embed2, 6)
         elif self.moduli == 'sphere':
             if self.changeembed:
-                embed1 = 10*torch.rand(self.Ng, 3)
-                embed2 = 10*torch.rand(self.Ng, 3)
+                embed1 = (torch.randn(self.Ng, 3))
+                embed1 = embed1/torch.linalg.norm(embed1, dim=1, keepdim=True)
+                embed2 = (torch.randn(self.Ng, 3))
+                embed2 = embed2/torch.linalg.norm(embed2, dim=1, keepdim=True)
             else:
-                embed1 = 10*torch.rand(self.Ng, 3)
+                embed1 = (torch.randn(self.Ng, 3))
+                embed1 = embed1/torch.linalg.norm(embed1, dim=1, keepdim=True)
                 embed2 = embed1
             self.reg = sphere_distance(embed1, embed2)
+        elif self.moduli == 's3':
+            if self.changeembed:
+                embed1 = torch.randn(self.Ng, 4)
+                embed1 = embed1/torch.linalg.norm(embed1, dim=1, keepdim=True)
+                embed2 = torch.randn(self.Ng, 4)
+                embed2 = embed2/torch.linalg.norm(embed2, dim=1, keepdim=True)
+            else:
+                embed1 = torch.randn(self.Ng, 4)
+                embed1 = embed1/torch.linalg.norm(embed1, dim=1, keepdim=True)
+                embed2 = embed1
+            self.reg = 2*sphere_distance(embed1, embed2)
         elif self.moduli == 'circle':
             if self.changeembed:
-                embed1 = 10*torch.rand(self.Ng, 2)
-                embed2 = 10*torch.rand(self.Ng, 2)
+                embed1 = torch.randn(self.Ng, 2)
+                embed1 = embed1/torch.linalg.norm(embed1, dim=1, keepdim=True)
+                embed2 = torch.randn(self.Ng, 2) 
+                embed2 = embed2/torch.linalg.norm(embed2, dim=1, keepdim=True)
             else:
-                embed1 = 10*torch.rand(self.Ng, 2)
+                embed1 = torch.randn(self.Ng, 2)
+                embed1 = embed1/torch.linalg.norm(embed1, dim=1, keepdim=True)
                 embed2 = embed1
             self.reg = sphere_distance(embed1, embed2)
         elif self.moduli == 'standard':
@@ -166,6 +183,8 @@ class regularizer(object):
         elif self.moduli == 'torus6':
             self.reg = torus_distance(self.embed, self.embed, 6)
         elif self.moduli == 'sphere':
+            self.reg = sphere_distance(self.embed, self.embed)
+        elif self.moduli == 's3':
             self.reg = sphere_distance(self.embed, self.embed)
         elif self.moduli == 'circle':
             self.reg = sphere_distance(self.embed, self.embed)

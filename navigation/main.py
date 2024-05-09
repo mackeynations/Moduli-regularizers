@@ -12,6 +12,9 @@ import torch
 import torch.nn as nn
 import torch.nn.utils.prune as prune
 import torch.nn.functional as F
+import os
+import time
+
 
 
 from utils import generate_run_ID
@@ -41,7 +44,7 @@ parser.add_argument('--sequence_length',
                     default=50,
                     help='number of steps in trajectory')
 parser.add_argument('--learning_rate',
-                    default=5e-5,
+                    default=1e-4,
                     type=float,
                     help='gradient descent learning rate')
 parser.add_argument('--Np',
@@ -83,7 +86,7 @@ parser.add_argument('--device',
                     help='device to use for training')
 parser.add_argument('--regularizer',
                     default='none',
-                    help='type of (moduli) regularizer applied. \n Try standard, torus, klein, circle, sphere, torus6.')
+                    help='type of (moduli) regularizer applied. \n Try standard, torus, klein, circle, sphere, torus6, s3.')
 parser.add_argument('--regpower',
                     default='square',
                     help='inhibitor function applied to distances. \n Try square, none, gauss, DoG, ripple, mean(only intended for standard reg)')
@@ -101,17 +104,19 @@ parser.add_argument('--regtype',
 parser.add_argument('--savefile',
                     default='_loss_sets')
 parser.add_argument('--save_repo',
-                    default='Graphs/FullSparse/',
+                    default='Graphs/Lottery/',
                     help='Folder the save file goes into')
 parser.add_argument('--invert',
                     default = False,
                     help='Use opposite inhibitor function')
 parser.add_argument('--trainembed',
                     default = False,
+                    type=bool,
                     help = 'Whether embedding is registered, trained parameters. Not compatible with changeembed.')
 parser.add_argument('--target_perc',
                     type=float,
                     default=90)
+
 
 options = parser.parse_args()
 options.run_ID = generate_run_ID(options)
@@ -120,7 +125,7 @@ print(f'Using device: {options.device}')
 
 def compute_sparsity(x):
     #return torch.sum(x**2)/(torch.sum(torch.abs(x))**2)
-    return torch.sum(torch.where(torch.abs(x) < .01, 1.0, 0.0))/(4096**2)
+    return torch.sum(torch.where(torch.abs(x) < .001, 1.0, 0.0))/(4096**2)
 
 
 
@@ -139,22 +144,43 @@ trajectory_generator = TrajectoryGenerator(options, place_cells)
 trainer = Trainer(options, model, trajectory_generator)
 
 # Train
+start_train = time.time()
 trainer.train(options, n_epochs=options.n_epochs, n_steps=options.n_steps)
+elapsed = time.time() - start_train
+with open(options.save_repo + options.savefile + '.txt', 'a') as the_file:
+    the_file.write('TOTAL TRAINING TIME: {}\n'.format(elapsed))
+if options.trainembed:
+    torch.save(model.reg, 'models/embeddings/' + self.savefile + '.pt')
+    
 
 # Validate Sparseness
 trajectory_generator2 = TrajectoryGenerator(options, place_cells)
 #model.load_state_dict(torch.load('models/bestachieved' + options.savefile + '.pt'))
 valid = sparsevalid.SparseValidator(options, model, trajectory_generator2)
 valid.test(options, n_epochs = 1, n_steps = 5)
-#for p in [20, 40, 60, 80, 90, 95]:
-#    model = RNN(options, place_cells).to(options.device)
-#    model.load_state_dict(torch.load('models/bestachieved' + options.savefile + '.pt'))
-#    validp = sparsevalid.PercentileSparse(options, model, trajectory_generator2, p)
-#    validp.test(options, n_epochs=1, n_steps=5)
 
-# Increase to 98% sparsity
-options.target_perc = float(98)
-trainer.train2(options, n_epochs=5, n_steps=options.n_steps)
+
+ckpt_dir = os.path.join(options.save_dir, options.run_ID)
+savefile = os.path.join(ckpt_dir, 'most_recent_model.pth')
+model = RNN(options, place_cells).to(options.device)
+myparams = ((model.encoder, 'weight'),
+            (model.RNN, 'weight_hh_l0'),
+            (model.RNN, 'weight_ih_l0'),
+            (model.decoder, 'weight'))
+prune.global_unstructured(myparams,
+                          pruning_method = prune.L1Unstructured,
+                          amount=.5)
+wts = torch.load(savefile)
+wts_trimmed = {k:v for k, v in wts.items() if k.endswith('mask')}
+model.load_state_dict(wts_trimmed, strict=False)
+model.RNN.flatten_parameters()
+trainer = Trainer(options, model, trajectory_generator)
+
+start_lottery = time.time()
+trainer.train_sp(options, n_epochs=options.n_epochs, n_steps=options.n_steps)
+elapsed = time.time() - start_lottery
+with open(options.save_repo + options.savefile + '.txt', 'a') as the_file:
+    the_file.write('TOTAL LOTTERY TIME: {}\n'.format(elapsed))
+
 valid = sparsevalid.SparseValidator(options, model, trajectory_generator2)
-
-                            
+valid.test(options, n_epochs = 1, n_steps = 5)

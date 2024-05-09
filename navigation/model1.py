@@ -18,6 +18,7 @@ class RNN(torch.nn.Module):
         self.device = options.device
         self.place_cells = place_cells
         self.embed_dim = 2
+        self.moduli = options.regularizer
         
 
         # Input weights
@@ -36,7 +37,14 @@ class RNN(torch.nn.Module):
         if self.trainembed == False:
             self.reg = regularizer.regularizer(options)
         else:
-            self.embed = nn.Parameter(10*torch.rand(self.Ng, 2))
+            if self.moduli == 'torus':
+                self.embed = nn.Parameter(10*torch.rand(self.Ng, 2))
+            elif self.moduli == 's3':
+                emb = torch.randn(self.Ng, 4)
+                emb = emb/torch.linalg.norm(emb, dim=1, keepdim=True)
+                self.embed = nn.Parameter(emb)
+            else:
+                raise NotImplementedError
             self.reg = regularizer.regularizer(options, self.embed)
             
         
