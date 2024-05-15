@@ -118,16 +118,16 @@ class regularizer(object):
                 embed1 = 10*torch.rand(self.Ng, 2)
                 embed2 = 10*torch.rand(self.Ng, 2)
             else:
-                embed1 = 10*torch.rand(self.Ng, 2)
-                embed2 = embed1
+                embed1 = self.embed  # 10*torch.rand(self.Ng, 2)
+                embed2 = self.embed  # embed1
             self.reg = torus_distance(embed1, embed2, 2)
         elif self.moduli == 'klein':
             if self.changeembed:
                 embed1 = 10*torch.rand(self.Ng, 2).to(device)
                 embed2 = 10*torch.rand(self.Ng, 2).to(device)
             else:
-                embed1 = 10*torch.rand(self.Ng, 2).to(device)
-                embed2 = embed1
+                embed1 = self.embed # 10*torch.rand(self.Ng, 2).to(device)
+                embed2 = self.embed # embed1
             self.reg, _ = klein_distance(embed1, embed2) #TODO edits here
         elif self.moduli == 'torus6':
             if self.changeembed:
@@ -144,9 +144,9 @@ class regularizer(object):
                 embed2 = (torch.randn(self.Ng, 3))
                 embed2 = embed2/torch.linalg.norm(embed2, dim=1, keepdim=True)
             else:
-                embed1 = (torch.randn(self.Ng, 3))
-                embed1 = embed1/torch.linalg.norm(embed1, dim=1, keepdim=True)
-                embed2 = embed1
+                embed1 = self.embed # (torch.randn(self.Ng, 3))
+                #embed1 = embed1/torch.linalg.norm(embed1, dim=1, keepdim=True)
+                embed2 = self.embed  # embed1
             self.reg = sphere_distance(embed1, embed2)
         elif self.moduli == 's3':
             if self.changeembed:
@@ -166,9 +166,9 @@ class regularizer(object):
                 embed2 = torch.randn(self.Ng, 2) 
                 embed2 = embed2/torch.linalg.norm(embed2, dim=1, keepdim=True)
             else:
-                embed1 = torch.randn(self.Ng, 2)
-                embed1 = embed1/torch.linalg.norm(embed1, dim=1, keepdim=True)
-                embed2 = embed1
+                embed1 = self.embed # torch.randn(self.Ng, 2)
+                #embed1 = embed1/torch.linalg.norm(embed1, dim=1, keepdim=True)
+                embed2 = self.embed # embed1
             self.reg = sphere_distance(embed1, embed2)
         elif self.moduli == 'standard':
             self.reg = torch.ones(self.Ng, self.Ng)

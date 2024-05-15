@@ -34,8 +34,26 @@ class RNN(torch.nn.Module):
         self.logsoftmax = torch.nn.LogSoftmax(dim=-1)
         
         self.trainembed = options.trainembed
+        
+        
+        
         if self.trainembed == False:
-            self.reg = regularizer.regularizer(options)
+            if self.moduli == 'torus':
+                self.embed = 10*torch.rand(self.Ng, 2)
+                self.reg = regularizer.regularizer(options, embed = self.embed)
+            elif self.moduli == 'circle':
+                self.embed = torch.randn(self.Ng, 2)
+                self.embed = self.embed/torch.linalg.norm(self.embed, dim=1, keepdim=True)
+                self.reg = regularizer.regularizer(options, embed = self.embed)
+            elif self.moduli == 'sphere':
+                self.embed = torch.randn(self.Ng, 3)
+                self.embed = self.embed/torch.linalg.norm(self.embed, dim=1, keepdim=True)
+                self.reg  = regularizer.regularizer(options, embed = self.embed)
+            elif self.moduli == 'klein':
+                self.embed = 10*torch.rand(self.Ng, 2)
+                self.reg = regularizer.regularizer(options, embed = self.embed)
+            else:
+                self.reg = regularizer.regularizer(options)
         else:
             if self.moduli == 'torus':
                 self.embed = nn.Parameter(10*torch.rand(self.Ng, 2))

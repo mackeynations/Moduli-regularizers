@@ -18,6 +18,7 @@ def generate_run_ID(options):
         'periodic', str(options.periodic),
         'lr', str(options.learning_rate),
         'weight_decay', str(options.weight_decay),
+        'regularizer', options.regularizer
         ]
     separator = '_'
     run_ID = separator.join(params)

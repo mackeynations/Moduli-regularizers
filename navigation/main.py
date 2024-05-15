@@ -31,11 +31,11 @@ parser.add_argument('--save_dir',
                     default='models/',
                     help='directory to save trained models')
 parser.add_argument('--n_epochs',
-                    default=30,
+                    default=30, 
                     type=int,
                     help='number of training epochs')
 parser.add_argument('--n_steps',
-                    default=1000,
+                    default= 1, 
                     help='batches per epoch')
 parser.add_argument('--batch_size',
                     default=200,
@@ -44,14 +44,14 @@ parser.add_argument('--sequence_length',
                     default=50,
                     help='number of steps in trajectory')
 parser.add_argument('--learning_rate',
-                    default=1e-4,
+                    default=1e-4, 
                     type=float,
                     help='gradient descent learning rate')
 parser.add_argument('--Np',
-                    default=512,
+                    default=512, 
                     help='number of place cells')
 parser.add_argument('--Ng',
-                    default=4096,
+                    default=4096, 
                     help='number of grid cells')
 parser.add_argument('--place_cell_rf',
                     default=0.12,
@@ -76,16 +76,16 @@ parser.add_argument('--periodic',
                     default=False,
                     help='trajectories with periodic boundary conditions')
 parser.add_argument('--box_width',
-                    default=2.2,
+                    default= 2.2, 
                     help='width of training environment')
 parser.add_argument('--box_height',
-                    default=2.2,
+                    default=2.2, 
                     help='height of training environment')
 parser.add_argument('--device',
                     default='cuda' if torch.cuda.is_available() else 'cpu',
                     help='device to use for training')
 parser.add_argument('--regularizer',
-                    default='none',
+                    default='klein', 
                     help='type of (moduli) regularizer applied. \n Try standard, torus, klein, circle, sphere, torus6, s3.')
 parser.add_argument('--regpower',
                     default='square',
@@ -121,6 +121,8 @@ parser.add_argument('--target_perc',
 options = parser.parse_args()
 options.run_ID = generate_run_ID(options)
 
+
+
 print(f'Using device: {options.device}')
 
 def compute_sparsity(x):
@@ -142,6 +144,10 @@ model = model.to(options.device)
 trajectory_generator = TrajectoryGenerator(options, place_cells)
 
 trainer = Trainer(options, model, trajectory_generator)
+
+## ADDED BELOW:
+np.save(os.path.join(options.save_dir, options.run_ID) + '/options.npy', options)
+
 
 # Train
 start_train = time.time()
@@ -176,6 +182,8 @@ model.load_state_dict(wts_trimmed, strict=False)
 model.RNN.flatten_parameters()
 trainer = Trainer(options, model, trajectory_generator)
 
+
+#%%
 start_lottery = time.time()
 trainer.train_sp(options, n_epochs=options.n_epochs, n_steps=options.n_steps)
 elapsed = time.time() - start_lottery
