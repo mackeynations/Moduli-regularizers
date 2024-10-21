@@ -51,18 +51,28 @@ def klein_distance(a, b):
 def sphere_distance(a, b):
     return 5 * torch.nan_to_num(torch.acos(torch.inner(a, b)))
 
+def rn_distance(a, b, embed_dim):
+    a = a.view(embed_dim, -1, 1)
+    b = b.view(embed_dim, 1, -1)
+    return torch.linalg.norm(a-b, dim=0)
+
 def small_gauss(x):
     return 100*torch.exp(-x**2/3)
 
 def DoG(x):
     return 100*(torch.exp(-x**2/5) - torch.exp(-4*x**2))
+#def DoG(x, a):
+#    return 100*(torch.exp(-x**2/a) - torch.exp(-a*x**2))
+
+def ripple(x):
+    return 50 + 50*torch.cos(2*x)
 
 
 class regularizer(object):
     def __init__(self, options, embed=None):
         
-        self.hidden_size = options.rnn_dim
-        self.reg = torch.zeros(self.hidden_size, self.hidden_size).to('cuda')
+        self.Ng = options.nhid
+        self.reg = torch.zeros(self.Ng, self.Ng).to(options.device)
         self.moduli = options.regularizer
         self.regpower = options.regpower
         self.changeembed = options.changeembed
@@ -72,7 +82,6 @@ class regularizer(object):
             self.generate2()
         else:
             self.generate()
-        self.reg = self.reg.to('cuda')
         self.regfunc()
         if options.permute:
             self.perm()
@@ -81,9 +90,9 @@ class regularizer(object):
         self.reg.to(options.device)
         
     def perm(self):
-        trans1 = list(range(self.hidden_size**2))
+        trans1 = list(range(self.Ng**2))
         random.shuffle(trans1)
-        self.reg = self.reg.view(-1)[torch.tensor(trans1)].view(self.hidden_size, self.hidden_size)
+        self.reg = self.reg.view(-1)[torch.tensor(trans1)].view(self.Ng, self.Ng)
         
     
     def invert(self):
@@ -100,55 +109,74 @@ class regularizer(object):
         elif self.regpower == 'DoG':
             self.reg = DoG(self.reg)
         elif self.regpower == 'mean':
-            embed1 = 10*torch.rand(self.hidden_size, 2)
+            embed1 = 10*torch.rand(self.Ng, 2)
             m = torch.mean(DoG(torus_distance(embed1, embed1, 2))).item()
             self.reg = m * self.reg
+        elif self.regpower == 'ripple':
+            self.reg = ripple(self.reg)
         
     def generate(self):
         if self.moduli == 'none':
             pass
         elif self.moduli == 'torus':
             if self.changeembed:
-                embed1 = 10*torch.rand(self.hidden_size, 2)
-                embed2 = 10*torch.rand(self.hidden_size, 2)
+                embed1 = 10*torch.rand(self.Ng, 2)
+                embed2 = 10*torch.rand(self.Ng, 2)
             else:
-                embed1 = 10*torch.rand(self.hidden_size, 2)
+                embed1 = 10*torch.rand(self.Ng, 2)
                 embed2 = embed1
             self.reg = torus_distance(embed1, embed2, 2)
         elif self.moduli == 'klein':
             if self.changeembed:
-                embed1 = 10*torch.rand(self.hidden_size, 2).to(device)
-                embed2 = 10*torch.rand(self.hidden_size, 2).to(device)
+                embed1 = 10*torch.rand(self.Ng, 2).to(device)
+                embed2 = 10*torch.rand(self.Ng, 2).to(device)
             else:
-                embed1 = 10*torch.rand(self.hidden_size, 2).to(device)
+                embed1 = 10*torch.rand(self.Ng, 2).to(device)
                 embed2 = embed1
             self.reg, _ = klein_distance(embed1, embed2) #TODO edits here
         elif self.moduli == 'torus6':
             if self.changeembed:
-                embed1 = 10*torch.rand(self.hidden_size, 6)
-                embed2 = 10*torch.rand(self.hidden_size, 6)
+                embed1 = 10*torch.rand(self.Ng, 6)
+                embed2 = 10*torch.rand(self.Ng, 6)
             else:
-                embed1 = 10*torch.rand(self.hidden_size, 6)
+                embed1 = 10*torch.rand(self.Ng, 6)
                 embed2 = embed1
             self.reg = torus_distance(embed1, embed2, 6)
         elif self.moduli == 'sphere':
             if self.changeembed:
-                embed1 = 10*torch.rand(self.hidden_size, 3)
-                embed2 = 10*torch.rand(self.hidden_size, 3)
+                embed1 = (torch.randn(self.Ng, 3))
+                embed1 = embed1/torch.linalg.norm(embed1, dim=1, keepdim=True)
+                embed2 = (torch.randn(self.Ng, 3))
+                embed2 = embed2/torch.linalg.norm(embed2, dim=1, keepdim=True)
             else:
-                embed1 = 10*torch.rand(self.hidden_size, 3)
+                embed1 = (torch.randn(self.Ng, 3))
+                embed1 = embed1/torch.linalg.norm(embed1, dim=1, keepdim=True)
                 embed2 = embed1
             self.reg = sphere_distance(embed1, embed2)
+        elif self.moduli == 's3':
+            if self.changeembed:
+                embed1 = torch.randn(self.Ng, 4)
+                embed1 = embed1/torch.linalg.norm(embed1, dim=1, keepdim=True)
+                embed2 = torch.randn(self.Ng, 4)
+                embed2 = embed2/torch.linalg.norm(embed2, dim=1, keepdim=True)
+            else:
+                embed1 = torch.randn(self.Ng, 4)
+                embed1 = embed1/torch.linalg.norm(embed1, dim=1, keepdim=True)
+                embed2 = embed1
+            self.reg = 2*sphere_distance(embed1, embed2)
         elif self.moduli == 'circle':
             if self.changeembed:
-                embed1 = 10*torch.rand(self.hidden_size, 2)
-                embed2 = 10*torch.rand(self.hidden_size, 2)
+                embed1 = torch.randn(self.Ng, 2)
+                embed1 = embed1/torch.linalg.norm(embed1, dim=1, keepdim=True)
+                embed2 = torch.randn(self.Ng, 2) 
+                embed2 = embed2/torch.linalg.norm(embed2, dim=1, keepdim=True)
             else:
-                embed1 = 10*torch.rand(self.hidden_size, 2)
+                embed1 = torch.randn(self.Ng, 2)
+                embed1 = embed1/torch.linalg.norm(embed1, dim=1, keepdim=True)
                 embed2 = embed1
             self.reg = sphere_distance(embed1, embed2)
         elif self.moduli == 'standard':
-            self.reg = torch.ones(self.hidden_size, self.hidden_size)
+            self.reg = torch.ones(self.Ng, self.Ng)
         
     def generate2(self):
         if self.moduli == 'none':
@@ -161,10 +189,14 @@ class regularizer(object):
             self.reg = torus_distance(self.embed, self.embed, 6)
         elif self.moduli == 'sphere':
             self.reg = sphere_distance(self.embed, self.embed)
+        elif self.moduli == 's3':
+            self.reg = sphere_distance(self.embed, self.embed)
         elif self.moduli == 'circle':
             self.reg = sphere_distance(self.embed, self.embed)
         elif self.moduli == 'standard':
-            self.reg = torch.ones(self.hidden_size, self.hidden_size)
+            self.reg = torch.ones(self.Ng, self.Ng)
+        elif self.moduli == 'r3':
+            self.reg = rn_distance(self.embed, self.embed, 3)
             
             
             
