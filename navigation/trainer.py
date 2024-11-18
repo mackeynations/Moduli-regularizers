@@ -69,6 +69,8 @@ class Trainer(object):
                 self.model.embed = nn.Parameter(self.model.embed/torch.linalg.norm(self.model.embed, dim=1, keepdim=True))
             elif self.options.regularizer == 'torus':
                 pass
+            elif self.options.regularizer == 'r3':
+                pass
             else: 
                 raise NotImplementedError
             self.model.reg = regularizer.regularizer(options, self.model.embed)

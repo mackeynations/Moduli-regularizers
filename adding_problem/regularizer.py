@@ -22,7 +22,7 @@ M4 = torch.tensor(np.array([[1, 0, 0],
                            [ 0, 1, -10],
                            [ 0, 0, 1]]), dtype=torch.float32)
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
+device = 'cuda:1' if torch.cuda.is_available() else 'cpu'
 
 M1 = M1.to(device)
 M2 = M2.to(device)
@@ -197,6 +197,8 @@ class regularizer(object):
             self.reg = torch.ones(self.Ng, self.Ng)
         elif self.moduli == 'r3':
             self.reg = rn_distance(self.embed, self.embed, 3)
+        elif self.moduli == 'r9':
+            self.reg = rn_distance(self.embed, self.embed, 9)
             
             
             

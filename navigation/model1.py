@@ -61,6 +61,9 @@ class RNN(torch.nn.Module):
                 emb = torch.randn(self.Ng, 4)
                 emb = emb/torch.linalg.norm(emb, dim=1, keepdim=True)
                 self.embed = nn.Parameter(emb)
+            elif self.moduli == 'r3':
+                emb = torch.randn(self.Ng, 3)
+                self.embed = nn.Parameter(emb)
             else:
                 raise NotImplementedError
             self.reg = regularizer.regularizer(options, self.embed)

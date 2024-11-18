@@ -51,6 +51,11 @@ def klein_distance(a, b):
 def sphere_distance(a, b):
     return 5 * torch.nan_to_num(torch.acos(torch.inner(a, b)))
 
+def rn_distance(a, b, embed_dim):
+    a = a.view(embed_dim, -1, 1)
+    b = b.view(embed_dim, 1, -1)
+    return torch.linalg.norm(a-b, dim=0)
+
 def small_gauss(x):
     return 100*torch.exp(-x**2/3)
 
@@ -118,16 +123,16 @@ class regularizer(object):
                 embed1 = 10*torch.rand(self.Ng, 2)
                 embed2 = 10*torch.rand(self.Ng, 2)
             else:
-                embed1 = self.embed  # 10*torch.rand(self.Ng, 2)
-                embed2 = self.embed  # embed1
+                embed1 = 10*torch.rand(self.Ng, 2)
+                embed2 = embed1
             self.reg = torus_distance(embed1, embed2, 2)
         elif self.moduli == 'klein':
             if self.changeembed:
                 embed1 = 10*torch.rand(self.Ng, 2).to(device)
                 embed2 = 10*torch.rand(self.Ng, 2).to(device)
             else:
-                embed1 = self.embed # 10*torch.rand(self.Ng, 2).to(device)
-                embed2 = self.embed # embed1
+                embed1 = 10*torch.rand(self.Ng, 2).to(device)
+                embed2 = embed1
             self.reg, _ = klein_distance(embed1, embed2) #TODO edits here
         elif self.moduli == 'torus6':
             if self.changeembed:
@@ -144,9 +149,9 @@ class regularizer(object):
                 embed2 = (torch.randn(self.Ng, 3))
                 embed2 = embed2/torch.linalg.norm(embed2, dim=1, keepdim=True)
             else:
-                embed1 = self.embed # (torch.randn(self.Ng, 3))
-                #embed1 = embed1/torch.linalg.norm(embed1, dim=1, keepdim=True)
-                embed2 = self.embed  # embed1
+                embed1 = (torch.randn(self.Ng, 3))
+                embed1 = embed1/torch.linalg.norm(embed1, dim=1, keepdim=True)
+                embed2 = embed1
             self.reg = sphere_distance(embed1, embed2)
         elif self.moduli == 's3':
             if self.changeembed:
@@ -166,12 +171,20 @@ class regularizer(object):
                 embed2 = torch.randn(self.Ng, 2) 
                 embed2 = embed2/torch.linalg.norm(embed2, dim=1, keepdim=True)
             else:
-                embed1 = self.embed # torch.randn(self.Ng, 2)
-                #embed1 = embed1/torch.linalg.norm(embed1, dim=1, keepdim=True)
-                embed2 = self.embed # embed1
+                embed1 = torch.randn(self.Ng, 2)
+                embed1 = embed1/torch.linalg.norm(embed1, dim=1, keepdim=True)
+                embed2 = embed1
             self.reg = sphere_distance(embed1, embed2)
         elif self.moduli == 'standard':
             self.reg = torch.ones(self.Ng, self.Ng)
+        elif self.moduli == 'mixedcurv':
+            embed1 = (torch.randn(self.Ng, 3))
+            embed1 = embed1/torch.linalg.norm(embed1, dim=1, keepdim=True)
+            d1 = sphere_distance(embed1, embed1)
+            embed2 = 10*torch.rand(self.Ng, 2)
+            d2 = torus_distance(embed2, embed2, 2)
+            self.reg = torch.sqrt(d1**2 + d2**2)
+            
         
     def generate2(self):
         if self.moduli == 'none':
@@ -190,6 +203,8 @@ class regularizer(object):
             self.reg = sphere_distance(self.embed, self.embed)
         elif self.moduli == 'standard':
             self.reg = torch.ones(self.Ng, self.Ng)
+        elif self.moduli == 'r3':
+            self.reg = rn_distance(self.embed, self.embed, 3)
             
             
             
